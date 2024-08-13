@@ -73,7 +73,7 @@ public class LegStepManager {
     }
     
     public void tickStepping(Vec3 movementMomentum) {
-        movementMomentum = movementMomentum.scale(2);
+        movementMomentum = movementMomentum.scale(1.5);
         legStepTick += legStepRate;
         
         if (legStepTick >= 1) {
