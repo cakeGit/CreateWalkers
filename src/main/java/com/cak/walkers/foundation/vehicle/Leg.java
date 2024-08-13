@@ -80,11 +80,4 @@ public class Leg {
         return this;
     }
     
-    //TODO: remove
-    @Deprecated
-    public Leg withVisualPosition(AbstractVehicleImplementation vehicle) {
-        worldPosition = vehicle.legToWorldVisualPosition(offset);
-        return this;
-    }
-    
 }

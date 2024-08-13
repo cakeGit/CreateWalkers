@@ -28,7 +28,7 @@ public class LegStepManager {
             quadrantHandlers.add(handler);
             handlersByQuadrant.put(handler.quadrant, quadrantHandlers);
         }
-        legStepRate = vehicle.legs.size() / (2f * legStepTime);
+        legStepRate = vehicle.legs.size() / ((float) legStepTime * 2);
     }
     
     public void renderDebug() {
@@ -72,7 +72,8 @@ public class LegStepManager {
         return maximumDeltas.get(0);
     }
     
-    public void tickStepping() {
+    public void tickStepping(Vec3 movementMomentum) {
+        movementMomentum = movementMomentum.scale(2);
         legStepTick += legStepRate;
         
         if (legStepTick >= 1) {
@@ -87,9 +88,10 @@ public class LegStepManager {
                 }
                 boolean canStep = canStep(stepCandidates.get(i));
                 if (canStep) {
-                    stepCandidates.get(i).doStep();
+                    stepCandidates.get(i).doStep(vehicle.level, movementMomentum);
+                } else {
+                    legStepTick++;
                 }
-                
             }
         }
         
@@ -97,6 +99,9 @@ public class LegStepManager {
     }
     
     private boolean canStep(LegStepHandler legStepHandler) {
+        if (handlersByQuadrant.get(legStepHandler.quadrant).stream().anyMatch(leg -> leg.isDown && leg != legStepHandler)) {
+            return true;
+        }
         for (Quadrant neighbor : legStepHandler.quadrant.getNeighbors()) {
             if (handlersByQuadrant.get(neighbor).isEmpty())
                 throw new AssertionError();

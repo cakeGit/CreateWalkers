@@ -27,7 +27,7 @@ public class BalanceInfo {
             int balanceOffset = (int) Math.floor(leg.offset.get(rotationAxis));
             
             Balance balance = balancesByOffset.getOrDefault(
-                        balanceOffset, new Balance(balanceOffset, new ArrayList<>()));
+                balanceOffset, new Balance(balanceOffset, new ArrayList<>()));
             balance.legs.add(leg);
             balancesByOffset.put(balanceOffset, balance);
         }
@@ -61,15 +61,19 @@ public class BalanceInfo {
         }
     }
     
-    /**Get the extent and center balances, based on direction of the unsupported side*/
+    /**
+     * Get the extent and center balances, based on direction of the unsupported side
+     */
     public Pair<Balance, Balance> getBalancePair(Direction.AxisDirection direction) {
         if (direction == Direction.AxisDirection.POSITIVE)
-            return Pair.of(frontBalance, centerBackBalance);
+            return Pair.of(centerFrontBalance, centerBackBalance);
         else
-            return Pair.of(centerFrontBalance, backBalance);
+            return Pair.of(centerBackBalance, centerFrontBalance);
     }
     
-    /**Returns whether to tick this or not, (with all aligned legs there's nothing to balance between)*/
+    /**
+     * Returns whether to tick this or not, (with all aligned legs there's nothing to balance between)
+     */
     public boolean isUnstable() {
         return unstable;
     }

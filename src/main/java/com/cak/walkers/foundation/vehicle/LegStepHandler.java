@@ -6,29 +6,39 @@ import com.simibubi.create.foundation.outliner.Outline;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.simibubi.create.foundation.utility.Color;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class LegStepHandler {
     
-    public static final int TOTAL_STEP_TICKS = 20;
+    public static final int TOTAL_STEP_TICKS = 55;
     
     Quadrant quadrant;
     Leg leg;
     
     boolean isDown = true;
     float currentStepTicks = 0;
-    float maximumDevianceRadius = 1f;
+    float maximumDevianceRadius = 0.5f;
     float maximumDevianceRadiusSqr = maximumDevianceRadius * maximumDevianceRadius;
     
     //Todo, add y rot handling, once the vehicle itself has y rot handling
-    /**Kept as the last down position of this leg*/
+    /**
+     * Kept as the last down position of this leg
+     */
     Vec3 currentPosition;
     float previousYRot;
-    /**Kept to where the leg is moving to*/
+    /**
+     * Kept to where the leg is moving to
+     */
     Vec3 stepTargetPosition;
     float stepTargetYRot;
-    /**Constantly updated to the "intended" position of the leg*/
+    /**
+     * Constantly updated to the "intended" position of the leg
+     */
     Vec3 targetPosition;
     float targetYRot;
     
@@ -64,15 +74,19 @@ public class LegStepHandler {
         return deltaLegPosition.add(currentPosition).subtract(targetPosition).with(Direction.Axis.Y, movementDelta.y);
     }
     
-    private Vec3 getVisualPosition(float partialTicks) {
+    public Vec3 getVisualPosition(float partialTicks) {
         if (isDown) return currentPosition;
-        float realTime = Math.min(currentStepTicks + partialTicks, TOTAL_STEP_TICKS);
-        if (realTime > 20) return stepTargetPosition;
-        Vec3 midPoint = currentPosition.lerp(stepTargetPosition, 0.5)
-            .add(0, 1, 0);
-        if (realTime == 10) return midPoint;
-        if (realTime < 10) return currentPosition.lerp(midPoint, realTime/10);
-        return midPoint.lerp(stepTargetPosition, (realTime-10)/10);
+        
+        float animationProgress = Mth.clamp((currentStepTicks + partialTicks) / (TOTAL_STEP_TICKS - 5), 0, 1);
+        
+        double yRaiseHeight = stepTargetPosition.y + 1;
+        return currentPosition
+            .lerp(stepTargetPosition, Mth.clamp((animationProgress * 1.4) - 0.2, 0, 1))
+            .with(Direction.Axis.Y,
+                animationProgress < 0.2 ? Mth.lerp(animationProgress / 0.2, currentPosition.y, yRaiseHeight) :
+                animationProgress > 0.8 ? Mth.lerp((animationProgress - 0.8) / 0.2, yRaiseHeight, stepTargetPosition.y) :
+                    yRaiseHeight
+            );
     }
     
     protected static Outline.OutlineParams showBox(String slot, AABB box) {
@@ -83,10 +97,27 @@ public class LegStepHandler {
         return targetPosition.subtract(currentPosition).horizontalDistanceSqr();
     }
     
-    public void doStep() {
+    /**
+     * Requires the level to calculate the target height
+     */
+    public void doStep(Level level, Vec3 movementMomentum) {
         isDown = false;
         currentStepTicks = 0;
-        stepTargetPosition = targetPosition;
+        
+        movementMomentum = movementMomentum.scale(10);
+//        if (movementMomentum.distanceToSqr(Vec3.ZERO) > 1)
+//            movementMomentum = movementMomentum.normalize();
+//
+        Vec3 moveToPos = targetPosition.add(movementMomentum);
+        
+        BlockHitResult hitResult = level.clip(new ClipContext(
+            moveToPos.subtract(0, 1, 0),
+            moveToPos.subtract(0, 3, 0),
+            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+            null
+        ));
+        
+        stepTargetPosition = hitResult.getLocation().add(0, 1.5, 0);
     }
     
     public Quadrant getQuadrant() {
@@ -94,12 +125,12 @@ public class LegStepHandler {
     }
     
     public void renderDebug() {
-        showLine(this+"prev", currentPosition, currentPosition);
-        showLine(this+"current",
+        showLine(this + "prev", currentPosition, currentPosition);
+        showLine(this + "current",
             getVisualPosition(AnimationTickHolder.getPartialTicks()).subtract(0, 1.5, 0),
             getVisualPosition(AnimationTickHolder.getPartialTicks()).add(0, 0.2, 0)
         )
-            .lineWidth(6/16f)
+            .lineWidth(6 / 16f)
             .colored(new Color(0x2255aa));
     }
     
