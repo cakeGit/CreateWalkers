@@ -1,6 +1,7 @@
 package com.cak.walkers.foundation.vehicle;
 
 import com.jozufozu.flywheel.util.Pair;
+import com.mojang.math.Axis;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.outliner.Outline;
 import com.simibubi.create.foundation.utility.Color;
@@ -9,7 +10,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,9 +48,6 @@ public class AbstractVehicleImplementation {
                 legToWorldVisualPosition(leg.offset.add(-0.5, 0, 0)),
                 legToWorldVisualPosition(leg.offset.add(0.5, 0, 0))
             );
-            
-            leg.withVisualPosition(this);
-            
             showPoint(leg + "anchor", leg.worldPosition);
             
             showBox(leg + "groundcollider", leg.getOnGroundColliderOfLeg())
@@ -63,14 +60,15 @@ public class AbstractVehicleImplementation {
                 .colored(leg.buried ? Color.BLACK : new Color(0x0000ff))
                 .lineWidth(1 / 32f);
         }
+        legStepManager.renderDebug();
     }
     
-    private Vec3 legToWorldVisualPosition(Vec3 offset) {
+    protected Vec3 legToWorldVisualPosition(Vec3 offset) {
         return offset.relative(Direction.UP, offset.get(axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X) * lastGradient)
             .add(lastPosition);
     }
     
-    private Vec3 legToWorldPosition(Vec3 offset) {
+    protected Vec3 legToWorldPosition(Vec3 offset) {
         return offset.relative(Direction.UP, offset.get(axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X) * gradient)
             .add(position);
     }
@@ -86,8 +84,14 @@ public class AbstractVehicleImplementation {
         if (legs.stream().anyMatch(leg -> leg.withUpdatedPosition(this).checkColliderBuried(level)))
             return;
         
+        //Make sure all legs are updated in their position before tick
+        legs.forEach(leg -> leg.withUpdatedPosition(this));
+        legStepManager.tickTargetPositions();
+        
         Vec3 movementDelta = new Vec3(0, 0, 0.05);
-        movementDelta = legStepManager.constrainMovement(movementDelta);
+        Vec3 constrainedDelta = legStepManager.constrainMovement(movementDelta);
+        if (movementDelta.dot(constrainedDelta) < 0)
+            movementDelta = Vec3.ZERO;
         position = position.add(movementDelta);
         
         if (!trySettlePosition()) return;
@@ -124,12 +128,12 @@ public class AbstractVehicleImplementation {
                 Direction.AxisDirection imbalanceDirection = hasFrontBalance ? Direction.AxisDirection.NEGATIVE : Direction.AxisDirection.POSITIVE;
                 Pair<BalanceInfo.Balance, BalanceInfo.Balance> balancePair = balanceInfo.getBalancePair(imbalanceDirection);
                 
-                double gradientDelta = (imbalanceDirection.getStep() * -0.5f) / balancePair.first().offset();
+                double gradientDelta = (imbalanceDirection.getStep() * -0.5f) / balancePair.second().offset();
                 gradientDelta = Math.max(Math.min(gradient + gradientDelta, 1), -1) - gradient;
                 
                 if (gradientDelta == 0) break; //Prevent iterations when no change is or can be done
                 
-                double positionDelta = -(gradientDelta * balanceInfo.getBalancePair(imbalanceDirection).second().offset());
+                double positionDelta = -(gradientDelta * balanceInfo.getBalancePair(imbalanceDirection).first().offset());
                 
                 position = position.add(0, positionDelta, 0);
                 gradient += (float) gradientDelta;
@@ -140,14 +144,17 @@ public class AbstractVehicleImplementation {
         if (hasRebalanced)
             trySettlePosition();
         
+        //Make sure all legs are updated in their position before tick
+        legs.forEach(leg -> leg.withUpdatedPosition(this));
         legStepManager.tickStepping();
     }
     
     private void initialise() {
-        legStepManager = new LegStepManager(this);
-        initialised = true;
+        legs.forEach(leg -> leg.withUpdatedPosition(this));
         Direction.Axis balanceAxis = axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
         balanceInfo = new BalanceInfo(legs, balanceAxis);
+        legStepManager = new LegStepManager(this);
+        initialised = true;
     }
     
     protected boolean trySettlePosition() {
@@ -195,86 +202,6 @@ public class AbstractVehicleImplementation {
         this.level = level;
     }
     
-    public static class Leg {
-        
-        Vec3 offset;
-        Vec3 worldPosition;
-        boolean onGround = false;
-        boolean inGround = false;
-        boolean buried = false;
-        
-        public Leg(Vec3 position) {
-            offset = position;
-            worldPosition = position;
-        }
-        
-        public AABB getDebugFootOfLeg() {
-            Vec3 anchor = worldPosition.subtract(0, 1.3, 0);
-            return new AABB(
-                anchor.subtract(0.4, 0.2, 0.4),
-                anchor.add(0.4, 0.2, 0.4)
-            );
-        }
-        
-        public AABB getBuriedColliderOfLeg() {
-            Vec3 anchor = worldPosition.subtract(0, 0.2, 0);
-            return new AABB(
-                anchor.subtract(0.4, 0, 0.4),
-                anchor.add(0.4, 0.01, 0.4)
-            );
-        }
-        
-        public AABB getInGroundColliderOfLeg() {
-            Vec3 anchor = worldPosition.subtract(0, 1.49, 0);
-            return new AABB(
-                anchor.subtract(0.4, 0, 0.4),
-                anchor.add(0.4, 0.05, 0.4)
-            );
-        }
-        
-        public AABB getOnGroundColliderOfLeg() {
-            Vec3 anchor = worldPosition.subtract(0, 1.5, 0);
-            return new AABB(
-                anchor.subtract(0.4, 0.05, 0.4),
-                anchor.add(0.4, 0, 0.4)
-            );
-        }
-        
-        public boolean checkCollidesOnGround(Level level) {
-            return onGround = checkForWorldCollision(getOnGroundColliderOfLeg(), level);
-        }
-        
-        public boolean checkCollidesInGround(Level level) {
-            return inGround = checkForWorldCollision(getInGroundColliderOfLeg(), level);
-        }
-        
-        public boolean checkColliderBuried(Level level) {
-            return buried = checkForWorldCollision(getBuriedColliderOfLeg(), level);
-        }
-        
-        private boolean checkForWorldCollision(AABB collider, Level level) {
-            for (VoxelShape shape : level.getCollisions(null, collider)) {
-                for (AABB aabb : shape.toAabbs()) {
-                    if (aabb.intersects(collider))
-                        return true;
-                }
-            }
-            return false;
-        }
-        
-        /**Either this or visual position must be called before checking colliders*/
-        public Leg withUpdatedPosition(AbstractVehicleImplementation vehicle) {
-            worldPosition = vehicle.legToWorldPosition(offset);
-            return this;
-        }
-        
-        public Leg withVisualPosition(AbstractVehicleImplementation vehicle) {
-            worldPosition = vehicle.legToWorldVisualPosition(offset);
-            return this;
-        }
-        
-    }
-    
     protected static Outline.OutlineParams showLine(String slot, Vec3 from, Vec3 to) {
         return CreateClient.OUTLINER.showLine(slot,
             from, to
@@ -289,6 +216,10 @@ public class AbstractVehicleImplementation {
     
     protected static Outline.OutlineParams showBox(String slot, AABB box) {
         return CreateClient.OUTLINER.showAABB(slot, box).lineWidth(2 / 16f);
+    }
+    
+    public boolean isInitialised() {
+        return initialised;
     }
     
 }

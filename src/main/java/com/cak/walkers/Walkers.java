@@ -5,6 +5,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientChatEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -29,7 +30,12 @@ public class Walkers {
             if (Minecraft.getInstance().level == null) return;
             testingClientVehicle.setCurrentLevel(Minecraft.getInstance().level);
             testingClientVehicle.tick();
-            testingClientVehicle.renderDebug();
+        }
+        @SubscribeEvent
+        public static void clientTick(RenderLevelStageEvent event) {
+            if (Minecraft.getInstance().level == null || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
+            if (testingClientVehicle.isInitialised())
+                testingClientVehicle.renderDebug();
         }
         
         @SubscribeEvent

@@ -2,6 +2,7 @@ package com.cak.walkers.foundation.vehicle;
 
 import com.jozufozu.flywheel.util.Pair;
 import net.minecraft.core.Direction;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +22,8 @@ public class BalanceInfo {
     Balance centerFrontBalance;
     Balance frontBalance;
     
-    public BalanceInfo(Set<AbstractVehicleImplementation.Leg> legs, Direction.Axis rotationAxis) {
-        for (AbstractVehicleImplementation.Leg leg : legs) {
+    public BalanceInfo(Set<Leg> legs, Direction.Axis rotationAxis) {
+        for (Leg leg : legs) {
             int balanceOffset = (int) Math.floor(leg.offset.get(rotationAxis));
             
             Balance balance = balancesByOffset.getOrDefault(
@@ -81,7 +82,13 @@ public class BalanceInfo {
         return balancesByOffset.values().stream().filter(balance -> balance.offset < balanceCenter).collect(Collectors.toSet());
     }
     
-    public record Balance(Integer offset, List<AbstractVehicleImplementation.Leg> legs) {
+    public Set<Balance> getAllBalancesOnSide(Direction.AxisDirection direction) {
+        if (direction == Direction.AxisDirection.NEGATIVE)
+            return getAllBackBalances();
+        return getAllFrontBalances();
+    }
+    
+    public record Balance(Integer offset, List<Leg> legs) {
     
     }
     
