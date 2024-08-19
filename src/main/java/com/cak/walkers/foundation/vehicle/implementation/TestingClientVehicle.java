@@ -5,6 +5,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
+@Deprecated
 public class TestingClientVehicle extends AbstractVehicleImplementation {
     
     public TestingClientVehicle() {

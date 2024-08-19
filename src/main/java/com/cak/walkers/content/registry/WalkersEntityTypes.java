@@ -22,7 +22,7 @@ public class WalkersEntityTypes {
     
     public static final EntityEntry<VehicleContraptionEntity> WALKER_CONTRAPTION =
         contraption("walker_contraption", VehicleContraptionEntity::new,
-            () -> VehicleContraptionEntityRenderer::new, 15, 3, true)
+            () -> VehicleContraptionEntityRenderer::new, 15, 1, true)
             .register();
     
     private static <T extends Entity> CreateEntityBuilder<T, ?> contraption(String name, EntityType.EntityFactory<T> factory,

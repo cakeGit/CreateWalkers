@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class AbstractVehicleImplementation {
     Double fallVelocity = 0d;
     boolean isFalling = false;
     
-    public AbstractVehicleImplementation(Set<Vec3> legPositions, Direction.Axis forwardsAxis) {
+    public AbstractVehicleImplementation(Collection<Vec3> legPositions, Direction.Axis forwardsAxis) {
         this.forwardsAxis = forwardsAxis;
         this.balanceAxis = this.forwardsAxis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
         
@@ -105,8 +106,8 @@ public class AbstractVehicleImplementation {
         
         legPhysicsManager.tick();
         
-        Vec3 movementDelta = new Vec3(0, 0, 0);
-        movementDelta = movementDelta.normalize().scale(0.05);
+        Vec3 movementDelta = new Vec3(1, 0, 0);
+        movementDelta = movementDelta.normalize().scale(0.3);
         movementDelta = movementDelta.yRot(yRot);
         
         float yRotDelta = 0f;
@@ -242,6 +243,11 @@ public class AbstractVehicleImplementation {
     
     public Vec3 getPosition() {
         return position;
+    }
+    
+    public void setPosition(int x, int y, int z) {
+        this.position = new Vec3(x, y, z);
+        this.chasingPosition = this.position;
     }
     
 }

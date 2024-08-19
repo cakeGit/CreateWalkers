@@ -16,16 +16,15 @@ import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VehicleContraption extends Contraption {
     
     @Nullable ContraptionVehicleImplementation vehicle;
-    NetworkedContraptionLegData legAnimationData = new NetworkedContraptionLegData();
     
     //TODO: remove annotation
-    @Nullable Set<Vec3> collectedLegPositions = new HashSet<>();
+    @Nullable Map<BlockPos, Vec3> collectedLegPositions = new HashMap<>();
     
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
@@ -34,19 +33,27 @@ public class VehicleContraption extends Contraption {
         if (!searchMovedStructure(world, pos, null))
             return false;
         
-        collectedLegPositions = Set.of(
-            new Vec3(-2, 0, -2),
-            new Vec3(-2, 0, 2),
-            new Vec3(2, 0, -2),
-            new Vec3(2, 0, 2)
+        collectedLegPositions = Map.of(
+            new BlockPos(-1, 0, -2),
+            new Vec3(-1, 0, -2).add(0.5, 0.5, 0.5),
+            
+            new BlockPos(3, 0, -2),
+            new Vec3(3, 0, -2).add(0.5, 0.5, 0.5),
+            
+            new BlockPos(-1, 0, 2),
+            new Vec3(-1, 0, 2).add(0.5, 0.5, 0.5),
+            
+            new BlockPos(3, 0, 2),
+            new Vec3(3, 0, 2).add(0.5, 0.5, 0.5)
         );
         
         //Check captured blocks form a valid vehicle, potentially throwing an AssemblyException
-        ContraptionVehicleImplementation.validate(collectedLegPositions, forwardsDirection.getAxis());
+        ContraptionVehicleImplementation.validate(collectedLegPositions.values(), forwardsDirection.getAxis());
         
         //Now create the vehicle
         vehicle = new ContraptionVehicleImplementation(collectedLegPositions, forwardsDirection.getAxis());
         
+        startMoving(world);
         return true;
     }
     
@@ -71,7 +78,6 @@ public class VehicleContraption extends Contraption {
         super.onEntityCreated(entity);
         if (entity instanceof VehicleContraptionEntity vce) {
             vce.vehicle = vehicle;
-            vehicle.setAnimationDataNetworker(legAnimationData);
         }
     }
     

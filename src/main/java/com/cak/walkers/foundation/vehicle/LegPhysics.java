@@ -17,14 +17,21 @@ import org.jetbrains.annotations.Nullable;
 
 public class LegPhysics {
     
-    public static final int TOTAL_STEP_TICKS = 55;
+    public static final int TOTAL_STEP_TICKS = 5;
+    
+    @Deprecated //REMOVE THIS AFTER THE SILLY IS OVER
+    public static int GETTOTAL_STEP_TICKSFREEOFFINALTYRANTY() {
+        return 10;
+    }
     
     protected AttachedLeg attachment;
     protected AbstractVehicleImplementation vehicle;
     
+    /**Used for network tracking, becomes true when a networked property is changed, and then has to be set to false once networked*/
+    protected boolean changed = false;
     protected boolean isDown = true;
     protected boolean isSupported = true;
-    protected float currentStepTicks = 0;
+    protected int currentStepTicks = 0;
     protected float maximumDevianceRadius = 0.25f;
     protected float maximumDevianceRadiusSqr = maximumDevianceRadius * maximumDevianceRadius;
     
@@ -69,6 +76,7 @@ public class LegPhysics {
     }
     
     public void tick() {
+        maximumDevianceRadius = 3f;
         targetPosition = getTargetPos();
         Double y = getYHeightOfStepAtPosition(currentPosition);
         
@@ -76,6 +84,7 @@ public class LegPhysics {
         if (!isSupported) {
             currentPosition = getTargetPos();
             currentYRot = vehicle.getYRot();
+            changed = true;
             if (!isDown) {
                 currentStepTicks = 0;
                 isDown = true;
@@ -83,35 +92,37 @@ public class LegPhysics {
             return;
         }
         
-        if (Math.abs(currentPosition.y - y) > 1 / 16f && isDown)
+        if (Math.abs(currentPosition.y - y) > 1 / 16f && isDown) {
             currentPosition = currentPosition.with(Direction.Axis.Y, y);
+            changed = true;
+        }
         
         if (!isDown)
             currentStepTicks++;
-        if (currentStepTicks == TOTAL_STEP_TICKS) {
+        if (currentStepTicks >= GETTOTAL_STEP_TICKSFREEOFFINALTYRANTY()) {
             currentStepTicks = 0;
             currentPosition = stepTargetPosition;
             currentYRot = vehicle.getYRot();
             isDown = true;
+            changed = true;
         }
     }
-    
     
     private @Nullable Double getYHeightOfStepAtPosition(Vec3 position) {
         //TODO: change to level clipping, but for now just check the center since its a ray
         
-        position = new Vec3(
-            Math.floor(position.x) + 0.5,
-            Math.floor(position.y) + 0.5,
-            Math.floor(position.z) + 0.5
-        );
+//        position = new Vec3(
+//            Math.floor(position.x) + 0.5,
+//            Math.floor(position.y) + 0.5,
+//            Math.floor(position.z) + 0.5
+//        );
         
         
         Vec3 legTop = position.add(0, 1.5, 0);
         
         BlockHitResult hitResult = level.clip(new ClipContext(
             legTop,
-            position.subtract(0, 3, 0),
+            position.subtract(0, 3.5, 0),
             ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
             null
         ));
@@ -153,7 +164,7 @@ public class LegPhysics {
     }
     
     public float getAnimationStepProgress(float partialTicks) {
-        return Mth.clamp((currentStepTicks + partialTicks) / (TOTAL_STEP_TICKS - 5), 0, 1);
+        return Mth.clamp((currentStepTicks + partialTicks) / (GETTOTAL_STEP_TICKSFREEOFFINALTYRANTY()), 0, 1);
     }
     
     /**
@@ -190,12 +201,13 @@ public class LegPhysics {
         if (moveToPos == null || yOutOfBounds(moveToPos.y, vehicle.currentYAtOffset(attachment.offset.get(vehicle.getForwardsAxis())))) return;
         
         isDown = false;
+        changed = true;
         currentStepTicks = 0;
         stepTargetPosition = moveToPos;
     }
     
     public @Nullable Vec3 getStepTargetPos(Vec3 movementMomentum) {
-        movementMomentum = movementMomentum.normalize().scale(maximumDevianceRadius * 2);
+        movementMomentum = movementMomentum.normalize().scale(maximumDevianceRadius * 0.5f);
         Vec3 position = targetPosition.add(movementMomentum);
         Double y = getYHeightOfStepAtPosition(position);
         
@@ -255,8 +267,10 @@ public class LegPhysics {
         if (getAnimationStepProgress(0) > 0.8) return;
         
         Vec3 updatedPos = getStepTargetPos(movementDirection);
-        if (updatedPos != null)
+        if (updatedPos != null) {
+            changed = true;
             stepTargetPosition = updatedPos;
+        }
     }
     
     public boolean yOutOfBounds(double thisY, double vehicleY) {
@@ -269,6 +283,34 @@ public class LegPhysics {
     
     public void tickLegYConstraints(double vehicleY) {
        currentPosition = clampYToBounds(currentPosition, vehicleY);
+    }
+    
+    public boolean isChanged() {
+        return changed;
+    }
+    
+    public void notifyUpdated() {
+        changed = false;
+    }
+    
+    public Vec3 getCurrentPosition() {
+        return currentPosition;
+    }
+    
+    public Vec3 getCurrentStepTargetPosition() {
+        return stepTargetPosition;
+    }
+    
+    public boolean isDown() {
+        return isDown;
+    }
+    
+    public Vec3 getStepTargetPosition() {
+        return stepTargetPosition;
+    }
+    
+    public int getCurrentStepTicks() {
+        return currentStepTicks;
     }
     
 }

@@ -1,27 +1,48 @@
 package com.cak.walkers.foundation.vehicle.implementation;
 
 import com.cak.walkers.content.contraption.NetworkedContraptionLegData;
+import com.cak.walkers.foundation.vehicle.AttachedLeg;
+import com.cak.walkers.foundation.vehicle.LegPhysics;
 import com.cak.walkers.foundation.vehicle.balance.Quadrant;
 import com.simibubi.create.content.contraptions.AssemblyException;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.EnumMap;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ContraptionVehicleImplementation extends AbstractVehicleImplementation {
     
     /**The relative position of the center of the vehicle implementation to the center of the contraption*/
     Vec3 anchorOffset;
+    HashMap<BlockPos, AttachedLeg> legsByStructureAnchor = new HashMap<>();
     
-    public ContraptionVehicleImplementation(Set<Vec3> legPositions, Direction.Axis forwardsAxis) {
-        super(centerLegPositions(legPositions), forwardsAxis);
+    public ContraptionVehicleImplementation(Map<BlockPos, Vec3> legPositions, Direction.Axis forwardsAxis) {
+        super(centerLegPositions(legPositions.values()), forwardsAxis);
         //legPositions does not correct to be centered
-        anchorOffset = getCenter(legPositions);
+        anchorOffset = getCenter(legPositions.values());
+        
+        for (Map.Entry<BlockPos, Vec3> entry : legPositions.entrySet()) {
+            AttachedLeg attachedLeg = legs.stream().filter(leg -> leg.getOffset().equals(entry.getValue().subtract(anchorOffset)))
+                .findFirst().orElseThrow();
+            legsByStructureAnchor.put(entry.getKey(), attachedLeg);
+        }
     }
     
-    protected static Vec3 getCenter(Set<Vec3> legPositions) {
+    /**@return whether to send the leg data to client*/
+    public boolean tickNetworkChanges() {
+        boolean changed = false;
+        for (LegPhysics legPhysics : legPhysicsManager.getAllLegPhysics()) {
+            if (legPhysics.isChanged()) {
+                changed = true;
+                legPhysics.notifyUpdated();
+            }
+        }
+        return changed;
+    }
+    
+    protected static Vec3 getCenter(Collection<Vec3> legPositions) {
         Vec3 centerPos = Vec3.ZERO;
         int legCount = legPositions.size();
         
@@ -31,7 +52,7 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
         return centerPos;
     }
     
-    protected static Set<Vec3> centerLegPositions(Set<Vec3> legPositions) {
+    protected static Collection<Vec3> centerLegPositions(Collection<Vec3> legPositions) {
         Vec3 anchorOffset = getCenter(legPositions);
 
         //Offset so that the center is 0, 0
@@ -40,7 +61,7 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
             .collect(Collectors.toSet());
     }
     
-    public static void validate(Set<Vec3> legPositions, Direction.Axis forwardsAxis) throws AssemblyException {
+    public static void validate(Collection<Vec3> legPositions, Direction.Axis forwardsAxis) throws AssemblyException {
         legPositions = centerLegPositions(legPositions);
         
         //Todo, for now it checks that theres a leg in all quadrants, but this should maybe be extended in the future to handle more diverse types
@@ -59,7 +80,8 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
         return anchorOffset;
     }
     
-    public void setAnimationDataNetworker(NetworkedContraptionLegData legAnimationData) {
+    public Map<BlockPos, AttachedLeg> getLegsByStructureAnchor() {
+        return legsByStructureAnchor;
     }
     
 }

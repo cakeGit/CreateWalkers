@@ -44,11 +44,12 @@ public class VehicleControllerBlockEntity extends SmartBlockEntity {
             Direction facing = getBlockState().getValue(VehicleControllerBlock.FACING);
             
             contraption.removeBlocksFromWorld(level, BlockPos.ZERO);
-            VehicleContraptionEntity vehicleContraption = VehicleContraptionEntity.create(level, contraption, facing);
-            vehicleContraption.setPos(getBlockPos().getCenter());
-            level.addFreshEntity(vehicleContraption);
-            AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(level, worldPosition);
             
+            VehicleContraptionEntity vehicleContraption = VehicleContraptionEntity.create(level, contraption, facing);
+            
+            level.addFreshEntity(vehicleContraption);
+            
+            AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(level, worldPosition);
         } catch (AssemblyException e) {
             playerToNotify.displayClientMessage(Component.literal(e.getMessage()), true);
             return false;

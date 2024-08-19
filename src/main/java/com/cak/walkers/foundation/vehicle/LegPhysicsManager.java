@@ -84,8 +84,8 @@ public class LegPhysicsManager {
             
             if (movementDelta.horizontalDistanceSqr() > constrainedDelta.horizontalDistanceSqr())
                 rotationDelta = rotationDelta * (float) (
-                    constrainedDelta.distanceToSqr(0, 0, 0) /
-                    movementDelta.distanceToSqr(0, 0, 0)
+                    constrainedDelta.horizontalDistanceSqr() /
+                    movementDelta.horizontalDistanceSqr()
                 );
         }
         return rotationDelta;
@@ -126,7 +126,7 @@ public class LegPhysicsManager {
     }
     
     private Vec3 getRotationDelta(LegPhysics handler, float yRot) {
-        return handler.attachment.offset.yRot(yRot).subtract(handler.attachment.offset.yRot(handler.currentYRot));
+        return (handler.attachment.offset.yRot(yRot)).subtract(handler.attachment.offset.yRot(vehicle.getYRot()));
     }
     
     private boolean canStep(LegPhysics legPhysics) {
@@ -208,6 +208,10 @@ public class LegPhysicsManager {
         for (LegPhysics legPhysics : allLegPhysics) {
             legPhysics.currentPosition = legPhysics.currentPosition.subtract(0, fallVelocity, 0);
         }
+    }
+    
+    public Set<LegPhysics> getAllLegPhysics() {
+        return allLegPhysics;
     }
     
 }
