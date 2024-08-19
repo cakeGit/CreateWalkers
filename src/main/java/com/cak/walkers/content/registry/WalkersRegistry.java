@@ -1,8 +1,12 @@
 package com.cak.walkers.content.registry;
 
 import com.cak.walkers.content.components.controller.VehicleControllerBlock;
+import com.cak.walkers.content.components.controller.VehicleControllerMovingInteractionBehavior;
 import com.simibubi.create.AllCreativeModeTabs;
+import com.simibubi.create.AllInteractionBehaviours;
+import com.simibubi.create.AllMovementBehaviours;
 import com.simibubi.create.Create;
+import com.simibubi.create.content.contraptions.behaviour.MovingInteractionBehaviour;
 import com.simibubi.create.foundation.utility.Components;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.core.registries.Registries;
@@ -21,9 +25,14 @@ import static com.cak.walkers.Walkers.REGISTRATE;
  */
 public class WalkersRegistry {
     
-    public static BlockEntry<VehicleControllerBlock> VEHICLE_BLOCK_CONTROLLER = REGISTRATE.block("vehicle_controller", VehicleControllerBlock::new).simpleItem().register();
+    public static BlockEntry<VehicleControllerBlock> VEHICLE_BLOCK_CONTROLLER = REGISTRATE
+        .block("vehicle_controller", VehicleControllerBlock::new)
+        .onRegister(block -> AllInteractionBehaviours.registerBehaviour(block, new VehicleControllerMovingInteractionBehavior()))
+        .simpleItem()
+        .register();
     
-    protected static final DeferredRegister<CreativeModeTab> TAB_REGISTER = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Create.ID);
+    protected static final DeferredRegister<CreativeModeTab> TAB_REGISTER = DeferredRegister
+        .create(Registries.CREATIVE_MODE_TAB, Create.ID);
     
     public static final RegistryObject<CreativeModeTab> TAB = TAB_REGISTER
         .register("tab", () -> CreativeModeTab.builder()

@@ -8,7 +8,6 @@ import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.outliner.Outline;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.simibubi.create.foundation.utility.Color;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -175,7 +174,7 @@ public class AbstractVehicleImplementation {
         initialised = true;
     }
     
-    public void setCurrentLevel(ClientLevel level) {
+    public void setCurrentLevel(Level level) {
         this.level = level;
         if (legPhysicsManager != null)
             legPhysicsManager.setLevel(level);
@@ -205,7 +204,7 @@ public class AbstractVehicleImplementation {
         return forwardsAxis;
     }
     
-    public Direction.Axis getBalanceAxis() {
+    public Direction.Axis getSideAxis() {
         return balanceAxis;
     }
     
@@ -231,6 +230,18 @@ public class AbstractVehicleImplementation {
     
     public float getYRot() {
         return yRot;
+    }
+    
+    public float getYRot(float partialTicks) {
+        return Mth.lerp(partialTicks, chasingYRot, yRot);
+    }
+    
+    public float getGradient(float partialTicks) {
+        return (float) Mth.lerp(partialTicks, chasingGradient, gradient);
+    }
+    
+    public Vec3 getPosition() {
+        return position;
     }
     
 }

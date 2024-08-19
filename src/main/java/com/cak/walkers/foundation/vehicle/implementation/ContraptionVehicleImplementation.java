@@ -1,7 +1,7 @@
 package com.cak.walkers.foundation.vehicle.implementation;
 
+import com.cak.walkers.content.contraption.NetworkedContraptionLegData;
 import com.cak.walkers.foundation.vehicle.balance.Quadrant;
-import com.cak.walkers.foundation.vehicle.validation.VehicleAssemblyException;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
@@ -53,6 +53,13 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
         for (Quadrant quadrant : Quadrant.values())
             if (!providedQuadrants.containsKey(quadrant))
                 throw new AssemblyException("bitch_i_need_full_quadrants");
+    }
+    
+    public Vec3 getAnchorOffset() {
+        return anchorOffset;
+    }
+    
+    public void setAnimationDataNetworker(NetworkedContraptionLegData legAnimationData) {
     }
     
 }

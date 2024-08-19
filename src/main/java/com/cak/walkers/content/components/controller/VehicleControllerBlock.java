@@ -7,9 +7,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,10 +21,16 @@ public class VehicleControllerBlock extends HorizontalDirectionalBlock implement
         super(p);
     }
     
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_49915_) {
+        super.createBlockStateDefinition(p_49915_);
+        p_49915_.add(FACING);
+    }
+    
     @SuppressWarnings("Deprecated") //Safe to override
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
-        return onBlockEntityUse(level, pos, VehicleControllerBlockEntity::blockInteracted);
+        return onBlockEntityUse(level, pos, be -> be.blockInteracted(player));
     }
     
     @Override
