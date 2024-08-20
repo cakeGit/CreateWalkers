@@ -23,9 +23,12 @@ public class VehicleContraptionRotationState extends AbstractContraptionEntity.C
         if (matrix != null) return matrix;
         matrix = new Matrix3d();
         
-        matrix = matrix.asYRotation(AngleHelper.rad(yaw + rotationOffset));
-        matrix = matrix.asZRotation(AngleHelper.rad(pitch));
-        matrix = matrix.asYRotation(AngleHelper.rad(-rotationOffset));
+        if (yaw + rotationOffset != 0)
+            matrix.multiply(new Matrix3d().asYRotation(AngleHelper.rad(yaw + rotationOffset)));
+        if (pitch != 0)
+            matrix.multiply(new Matrix3d().asZRotation(AngleHelper.rad(pitch)));
+        if (-rotationOffset != 0)
+            matrix.multiply(new Matrix3d().asYRotation(AngleHelper.rad(-rotationOffset)));
         
         return matrix;
     }
@@ -37,7 +40,7 @@ public class VehicleContraptionRotationState extends AbstractContraptionEntity.C
     
     @Override
     public boolean hasVerticalRotation() {
-        return true;
+        return pitch != 0;
     }
     
 }

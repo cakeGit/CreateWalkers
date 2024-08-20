@@ -1,6 +1,8 @@
 package com.cak.walkers.content.contraption;
 
+import com.cak.walkers.content.components.anchor.LegAnchorBlock;
 import com.cak.walkers.content.components.controller.VehicleControllerBlock;
+import com.cak.walkers.content.registry.WalkersBlocks;
 import com.cak.walkers.content.registry.WalkersContraptionTypes;
 import com.cak.walkers.foundation.vehicle.implementation.ContraptionVehicleImplementation;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
@@ -23,29 +25,16 @@ public class VehicleContraption extends Contraption {
     
     @Nullable ContraptionVehicleImplementation vehicle;
     
-    //TODO: remove annotation
-    @Nullable Map<BlockPos, Vec3> collectedLegPositions = new HashMap<>();
+    Map<BlockPos, Vec3> collectedLegPositions = new HashMap<>();
+    BlockPos assemblyAnchor;
     
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
+        assemblyAnchor = pos;
         Direction forwardsDirection = world.getBlockState(pos).getValue(VehicleControllerBlock.FACING);
         
         if (!searchMovedStructure(world, pos, null))
             return false;
-        
-        collectedLegPositions = Map.of(
-            new BlockPos(-1, 0, -2),
-            new Vec3(-1, 0, -2).add(0.5, 0.5, 0.5),
-            
-            new BlockPos(3, 0, -2),
-            new Vec3(3, 0, -2).add(0.5, 0.5, 0.5),
-            
-            new BlockPos(-1, 0, 2),
-            new Vec3(-1, 0, 2).add(0.5, 0.5, 0.5),
-            
-            new BlockPos(3, 0, 2),
-            new Vec3(3, 0, 2).add(0.5, 0.5, 0.5)
-        );
         
         //Check captured blocks form a valid vehicle, potentially throwing an AssemblyException
         ContraptionVehicleImplementation.validate(collectedLegPositions.values(), forwardsDirection.getAxis());
@@ -60,7 +49,9 @@ public class VehicleContraption extends Contraption {
     @Override
     protected void addBlock(BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair) {
         super.addBlock(pos, pair);
-        //TODO look for leg blocks
+        if (pair.getLeft().state().is(WalkersBlocks.LEG_ANCHOR.get())) {
+            collectedLegPositions.put(pos.subtract(anchor), LegAnchorBlock.getLegTargetPos(pos.subtract(anchor), pair.getLeft().state()));
+        }
     }
     
     @Override

@@ -1,11 +1,9 @@
 package com.cak.walkers.content.contraption;
 
-import com.jozufozu.flywheel.util.transform.TransformStack;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.contraptions.render.ContraptionEntityRenderer;
-import com.simibubi.create.foundation.outliner.LineOutline;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import net.minecraft.client.Minecraft;
@@ -24,7 +22,7 @@ public class VehicleContraptionEntityRenderer extends ContraptionEntityRenderer<
     @Override
     public void render(VehicleContraptionEntity entity, float yaw, float partialTicks, PoseStack ms, MultiBufferSource buffers, int overlay) {
         ms.pushPose();
-        NetworkedContraptionLegData ld = entity.legAnimationData;
+        NetworkedVehicleData ld = entity.vehicleAnimationData;
         if (ld == null) return;
         SuperRenderTypeBuffer buffer = SuperRenderTypeBuffer.getInstance();
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
@@ -33,7 +31,6 @@ public class VehicleContraptionEntityRenderer extends ContraptionEntityRenderer<
             Vec3 relativePos = legData.getVisualPosition(Mth.lerp(partialTicks, entity.yo, entity.getY()), partialTicks).subtract(entity.getPosition(partialTicks))
                 .subtract(0, 1.5, 0);
             CachedBufferer.partial(AllPartialModels.COGWHEEL_SHAFT, AllBlocks.SHAFT.getDefaultState())
-                .translate(-0.5, 0, -0.5)
                 .translate(relativePos.x, relativePos.y, relativePos.z)
                 .renderInto(ms, buffers.getBuffer(RenderType.solid()));
         }

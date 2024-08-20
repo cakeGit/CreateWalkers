@@ -7,6 +7,7 @@ import com.simibubi.create.AllInteractionBehaviours;
 import com.simibubi.create.AllMovementBehaviours;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.contraptions.behaviour.MovingInteractionBehaviour;
+import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.utility.Components;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.core.registries.Registries;
@@ -24,13 +25,7 @@ import static com.cak.walkers.Walkers.REGISTRATE;
  * Todo delegate subtypes i just really cant be asked rn
  */
 public class WalkersRegistry {
-    
-    public static BlockEntry<VehicleControllerBlock> VEHICLE_BLOCK_CONTROLLER = REGISTRATE
-        .block("vehicle_controller", VehicleControllerBlock::new)
-        .onRegister(block -> AllInteractionBehaviours.registerBehaviour(block, new VehicleControllerMovingInteractionBehavior()))
-        .simpleItem()
-        .register();
-    
+
     protected static final DeferredRegister<CreativeModeTab> TAB_REGISTER = DeferredRegister
         .create(Registries.CREATIVE_MODE_TAB, Create.ID);
     
@@ -38,7 +33,7 @@ public class WalkersRegistry {
         .register("tab", () -> CreativeModeTab.builder()
             .title(Components.translatable("itemGroup." + MODID + ".tab"))
             .withTabsBefore(AllCreativeModeTabs.BASE_CREATIVE_TAB.getKey())
-            .icon(() -> VEHICLE_BLOCK_CONTROLLER.asStack())
+            .icon(() -> WalkersBlocks.VEHICLE_CONTROLLER.asStack())
             .displayItems((displayParameters, output) -> {
                 output.acceptAll(
                     REGISTRATE.getAll(Registries.ITEM)
@@ -53,6 +48,7 @@ public class WalkersRegistry {
         TAB_REGISTER.register(bus);
         REGISTRATE.setCreativeTab(TAB);
         
+        WalkersBlocks.register();
         WalkersBlockEntityTypes.register();
         WalkersEntityTypes.register();
         WalkersContraptionTypes.register();

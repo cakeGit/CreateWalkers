@@ -102,9 +102,14 @@ public class AbstractVehicleImplementation {
         chasingPosition = position;
         chasingYRot = yRot;
         
-        if (!initialised) initialise();
+        //Avoids falling on the first tick, cause that happens? i guess?
+        boolean firstTick = false;
+        if (!initialised) {
+            firstTick = true;
+            initialise();
+        }
         
-        if (level == null || !initialised || balanceInfo.isUnstable()) return;
+        if (level == null  || balanceInfo.isUnstable()) return;
         
         legPhysicsManager.tick();
         
@@ -152,7 +157,7 @@ public class AbstractVehicleImplementation {
             } else if (frontLegsAnchor.y < frontMin) {
                 yPos += frontLegsAnchor.y-frontMin;
             }
-        } else if (!legPhysicsManager.isPartlySupported()) {
+        } else if (!legPhysicsManager.isPartlySupported() && !firstTick) {
             if (!isFalling) {
                 isFalling = true;
                 fallVelocity = 0d;
@@ -258,6 +263,11 @@ public class AbstractVehicleImplementation {
     
     public float getRotationOffset() {
         return rotationOffset;
+    }
+    
+    public void setPosition(Vec3 position) {
+        this.position = position;
+        this.chasingPosition = this.position;
     }
     
 }

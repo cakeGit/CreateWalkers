@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.cak.walkers.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "pattern_schematics.refmap.json",
+  "mixins": [
+    "ContraptionMatricesMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

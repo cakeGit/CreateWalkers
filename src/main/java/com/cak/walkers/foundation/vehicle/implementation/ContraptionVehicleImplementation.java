@@ -1,6 +1,6 @@
 package com.cak.walkers.foundation.vehicle.implementation;
 
-import com.cak.walkers.content.contraption.NetworkedContraptionLegData;
+
 import com.cak.walkers.foundation.vehicle.AttachedLeg;
 import com.cak.walkers.foundation.vehicle.LegPhysics;
 import com.cak.walkers.foundation.vehicle.balance.Quadrant;
@@ -31,15 +31,12 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
     }
     
     /**@return whether to send the leg data to client*/
-    public boolean tickNetworkChanges() {
-        boolean changed = false;
+    public void tickNetworkChanges() {
         for (LegPhysics legPhysics : legPhysicsManager.getAllLegPhysics()) {
             if (legPhysics.isChanged()) {
-                changed = true;
                 legPhysics.notifyUpdated();
             }
         }
-        return changed;
     }
     
     protected static Vec3 getCenter(Collection<Vec3> legPositions) {

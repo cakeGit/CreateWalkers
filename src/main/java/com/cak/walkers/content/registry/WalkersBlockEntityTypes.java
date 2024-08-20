@@ -9,7 +9,7 @@ public class WalkersBlockEntityTypes {
     
     public static BlockEntityEntry<VehicleControllerBlockEntity> VEHICLE_BLOCK_CONTROLLER_BLOCK_ENTITY = REGISTRATE
         .blockEntity("vehicle_controller_block_entity", VehicleControllerBlockEntity::new)
-        .validBlock(WalkersRegistry.VEHICLE_BLOCK_CONTROLLER)
+        .validBlock(WalkersBlocks.VEHICLE_CONTROLLER)
         .register();
     
     public static void register() {}

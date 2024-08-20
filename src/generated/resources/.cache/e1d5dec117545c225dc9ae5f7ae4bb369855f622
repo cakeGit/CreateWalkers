@@ -1,0 +1,9 @@
+// 1.20.1	2024-08-20T13:50:10.4814535	Registrate Provider for create_walkers [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+807d0c102bf053710526464b84d7ea5ddd7c26f3 assets/create_walkers/blockstates/leg_anchor.json
+1fa8fad46fafb8ab491ec470a6eb64eb9305b367 assets/create_walkers/blockstates/vehicle_controller.json
+609bb4fa54acafe292f5ed1fddd539c4b6136e01 assets/create_walkers/lang/en_ud.json
+e9b9b02705137b3a00b66a87fbdacfeb3d8a526d assets/create_walkers/lang/en_us.json
+d1f29ae77a9862ee47d0b7bace69cd740e4d93a5 assets/create_walkers/models/item/leg_anchor.json
+284fcd8a326dd2526d99329a96fd0b9f6de4ce3d assets/create_walkers/models/item/vehicle_controller.json
+b1c54fc2e89f0d019ea351883b939873e5532ed0 data/create_walkers/loot_tables/blocks/leg_anchor.json
+92d229a196d47f55384d2a1303d8e38d1ca16539 data/create_walkers/loot_tables/blocks/vehicle_controller.json

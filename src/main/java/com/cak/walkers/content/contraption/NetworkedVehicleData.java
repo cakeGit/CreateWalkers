@@ -7,7 +7,7 @@ import net.minecraft.nbt.NbtUtils;
 
 import java.util.*;
 
-public class NetworkedContraptionLegData {
+public class NetworkedVehicleData {
     
     public static final HashMap<UUID, VehicleContraptionEntity> VEHICLE_ANIMATION_TARGETS = new HashMap<>();
     
@@ -16,7 +16,7 @@ public class NetworkedContraptionLegData {
     
     VehicleContraptionEntity owner;
     
-    public NetworkedContraptionLegData(VehicleContraptionEntity owner) {
+    public NetworkedVehicleData(VehicleContraptionEntity owner) {
         this.owner = owner;
     }
     

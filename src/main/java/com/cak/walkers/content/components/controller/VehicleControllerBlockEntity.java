@@ -47,11 +47,12 @@ public class VehicleControllerBlockEntity extends SmartBlockEntity {
             
             VehicleContraptionEntity vehicleContraption = VehicleContraptionEntity.create(level, contraption, facing);
             
+            vehicleContraption.tick();
             level.addFreshEntity(vehicleContraption);
             
             AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(level, worldPosition);
         } catch (AssemblyException e) {
-            playerToNotify.displayClientMessage(Component.literal(e.getMessage()), true);
+            playerToNotify.displayClientMessage(e.component, true);
             return false;
         }
         return true;
