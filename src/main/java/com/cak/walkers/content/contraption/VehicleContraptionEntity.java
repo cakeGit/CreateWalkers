@@ -4,16 +4,23 @@ import com.cak.walkers.content.registry.WalkersEntityTypes;
 import com.cak.walkers.foundation.network.WalkersPackets;
 import com.cak.walkers.foundation.network.vehicle.VehicleAnimationDataPacket;
 import com.cak.walkers.foundation.vehicle.implementation.ContraptionVehicleImplementation;
+import com.jozufozu.flywheel.util.transform.TransformStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.OrientedContraptionEntity;
+import com.simibubi.create.foundation.utility.AngleHelper;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 public class VehicleContraptionEntity extends OrientedContraptionEntity {
+    
     
     public VehicleContraptionEntity(EntityType<?> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
@@ -24,6 +31,8 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
     /**Server only*/
     public @Nullable ContraptionVehicleImplementation vehicle;
     public NetworkedContraptionLegData legAnimationData = new NetworkedContraptionLegData(this);
+    
+    public float rotationOffset;
     
     @Override
     public void tick() {
@@ -48,10 +57,10 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         vehicle.tick();
         
         prevPitch = pitch;
-        pitch = -(float) (angleOfVehicleGradient(0) * (180f / Math.PI));
+        pitch = (float) Math.toDegrees(angleOfVehicleGradient(0));
         
         prevYaw = yaw;
-        yaw = -(float) (vehicle.getYRot() * (180f / Math.PI));
+        yaw = -(float) Math.toDegrees(vehicle.getPrimaryYRot());
         
         //TODO: check if the properties actually changed
         animationDataChanged = true;
@@ -60,7 +69,14 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         yo = getY();
         zo = getZ();
         
-        setPos(vehicle.getPosition().add(vehicle.getAnchorOffset()));
+        Vec3 newPos = vehicle.getPosition().add(
+            vehicle.getAnchorOffset()
+        );
+        
+        setContraptionMotion(newPos.subtract(position()));
+        
+        setPos(newPos);
+        
         //Change position to match the rotation an shit
         
         if (vehicle.tickNetworkChanges()) {
@@ -83,9 +99,9 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
             new VehicleContraptionEntity(WalkersEntityTypes.WALKER_CONTRAPTION.get(), world);
         entity.setContraption(contraption);
 //        entity.setInitialOrientation(initialOrientation);
-        entity.startAtInitialYaw();
         assert entity.vehicle != null;
         entity.vehicle.setPosition(0, 4, 0);
+        entity.rotationOffset = entity.vehicle.getRotationOffset();
         return entity;
     }
     
@@ -101,6 +117,43 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
     
     public void disassembleNextTick() {
         disassembleNextTick = true;
+    }
+    
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void applyLocalTransforms(PoseStack matrixStack, float partialTicks) {
+        float angleYaw = getViewYRot(partialTicks);
+        float anglePitch = getViewXRot(partialTicks);
+        
+        matrixStack.translate(-.5f, 0, -.5f);
+        
+        TransformStack.cast(matrixStack)
+            .nudge(getId())
+            .centre()
+            .rotateY(angleYaw)
+            .rotateY(Math.toDegrees(rotationOffset))
+            .rotateZ(anglePitch)
+            .rotateY(-Math.toDegrees(rotationOffset))
+            .unCentre();
+    }
+    
+    @Override
+    public ContraptionRotationState getRotationState() {
+        return new VehicleContraptionRotationState(rotationOffset, pitch, yaw);
+    }
+    
+    public Vec3 applyRotation(Vec3 localPos, float partialTicks) {
+        return localPos
+            .yRot(AngleHelper.rad(yaw + rotationOffset))
+            .zRot(AngleHelper.rad(pitch))
+            .yRot(AngleHelper.rad(-rotationOffset));
+    }
+    
+    public Vec3 reverseRotation(Vec3 localPos, float partialTicks) {
+        return localPos
+            .yRot(AngleHelper.rad(rotationOffset))
+            .zRot(AngleHelper.rad(-pitch))
+            .yRot(AngleHelper.rad(-(yaw + rotationOffset)));
     }
     
 }

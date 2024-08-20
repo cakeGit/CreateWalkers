@@ -18,7 +18,7 @@ public class TestingClientVehicle extends AbstractVehicleImplementation {
             new Vec3(1.5, 0, -1.5),
             new Vec3(1.5, 0, 3.5),
             new Vec3(1.5, 0, -3.5)
-        ), Direction.Axis.Z);
+        ), Direction.SOUTH);
     }
     
 }

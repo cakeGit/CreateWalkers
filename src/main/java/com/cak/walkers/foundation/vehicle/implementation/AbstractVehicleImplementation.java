@@ -33,14 +33,15 @@ public class AbstractVehicleImplementation {
     protected Vec3 position = new Vec3(0, 0, 0);
     protected double gradient = 0f;
     protected float yRot = 0f;
+    protected float rotationOffset;
     
     protected Vec3 chasingPosition = new Vec3(0, 0, 0);
     protected double chasingGradient = 0f;
     protected float chasingYRot = 0f;
     
     protected boolean balanced = true;
-    private final Direction.Axis forwardsAxis;
-    private final Direction.Axis balanceAxis;
+    private Direction.Axis forwardsAxis;
+    private  Direction.Axis balanceAxis;
     
     /**
      * Handles movement limits, as well as the visual positions of the legs
@@ -55,8 +56,9 @@ public class AbstractVehicleImplementation {
     Double fallVelocity = 0d;
     boolean isFalling = false;
     
-    public AbstractVehicleImplementation(Collection<Vec3> legPositions, Direction.Axis forwardsAxis) {
-        this.forwardsAxis = forwardsAxis;
+    public AbstractVehicleImplementation(Collection<Vec3> legPositions, Direction forwardsDirection) {
+        this.forwardsAxis = forwardsDirection.getAxis();
+        this.rotationOffset = forwardsAxis == Direction.Axis.Z ? (float) Math.PI / 2f : 0;
         this.balanceAxis = this.forwardsAxis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
         
         this.legs = legPositions.stream().map(
@@ -106,8 +108,8 @@ public class AbstractVehicleImplementation {
         
         legPhysicsManager.tick();
         
-        Vec3 movementDelta = new Vec3(1, 0, 0);
-        movementDelta = movementDelta.normalize().scale(0.3);
+        Vec3 movementDelta = new Vec3(0, 0, 0);
+        movementDelta = movementDelta.normalize().scale(0.1);
         movementDelta = movementDelta.yRot(yRot);
         
         float yRotDelta = 0f;
@@ -233,6 +235,10 @@ public class AbstractVehicleImplementation {
         return yRot;
     }
     
+    public float getPrimaryYRot() {
+        return yRot;
+    }
+    
     public float getYRot(float partialTicks) {
         return Mth.lerp(partialTicks, chasingYRot, yRot);
     }
@@ -248,6 +254,10 @@ public class AbstractVehicleImplementation {
     public void setPosition(int x, int y, int z) {
         this.position = new Vec3(x, y, z);
         this.chasingPosition = this.position;
+    }
+    
+    public float getRotationOffset() {
+        return rotationOffset;
     }
     
 }

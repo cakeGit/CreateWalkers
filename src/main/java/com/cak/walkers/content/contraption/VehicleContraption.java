@@ -51,7 +51,7 @@ public class VehicleContraption extends Contraption {
         ContraptionVehicleImplementation.validate(collectedLegPositions.values(), forwardsDirection.getAxis());
         
         //Now create the vehicle
-        vehicle = new ContraptionVehicleImplementation(collectedLegPositions, forwardsDirection.getAxis());
+        vehicle = new ContraptionVehicleImplementation(collectedLegPositions, forwardsDirection);
         
         startMoving(world);
         return true;

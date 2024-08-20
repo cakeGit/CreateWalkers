@@ -21,7 +21,7 @@ public class LegPhysics {
     
     @Deprecated //REMOVE THIS AFTER THE SILLY IS OVER
     public static int GETTOTAL_STEP_TICKSFREEOFFINALTYRANTY() {
-        return 10;
+        return 25;
     }
     
     protected AttachedLeg attachment;

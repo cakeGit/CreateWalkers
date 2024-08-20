@@ -18,8 +18,8 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
     Vec3 anchorOffset;
     HashMap<BlockPos, AttachedLeg> legsByStructureAnchor = new HashMap<>();
     
-    public ContraptionVehicleImplementation(Map<BlockPos, Vec3> legPositions, Direction.Axis forwardsAxis) {
-        super(centerLegPositions(legPositions.values()), forwardsAxis);
+    public ContraptionVehicleImplementation(Map<BlockPos, Vec3> legPositions, Direction forwards) {
+        super(centerLegPositions(legPositions.values()), forwards);
         //legPositions does not correct to be centered
         anchorOffset = getCenter(legPositions.values());
         

@@ -15,6 +15,7 @@ public class VehicleAnimationDataPacket extends SimplePacketBase {
     float yaw;
     float prevPitch;
     float pitch;
+    float rotationOffset;
     
     CompoundTag tagData;
     
@@ -26,19 +27,19 @@ public class VehicleAnimationDataPacket extends SimplePacketBase {
         this.yaw = vehicleEntity.yaw;
         this.prevPitch = vehicleEntity.prevPitch;
         this.pitch = vehicleEntity.pitch;
+        this.rotationOffset = vehicleEntity.rotationOffset;
     }
     
     public VehicleAnimationDataPacket(FriendlyByteBuf buffer) {
         this.vehicleEntity = NetworkedContraptionLegData.VEHICLE_ANIMATION_TARGETS.get(buffer.readUUID());
-        System.out.println("ASNsdfhgJFK");
         if (vehicleEntity != null) {
-            System.out.println("asdhfsadfhfh");
             this.tagData = buffer.readNbt();
             
             this.prevYaw = buffer.readFloat();
             this.yaw = buffer.readFloat();
             this.prevPitch = buffer.readFloat();
             this.pitch = buffer.readFloat();
+            this.rotationOffset = buffer.readFloat();
         }
     }
     
@@ -51,17 +52,18 @@ public class VehicleAnimationDataPacket extends SimplePacketBase {
         buffer.writeFloat(yaw);
         buffer.writeFloat(prevPitch);
         buffer.writeFloat(pitch);
+        buffer.writeFloat(rotationOffset);
     }
     
     @Override
     public boolean handle(NetworkEvent.Context context) {
         if (vehicleEntity != null) {
-            System.out.println("ASNfdJFK");
             vehicleEntity.legAnimationData.read(tagData);
             vehicleEntity.prevYaw = this.prevYaw;
             vehicleEntity.yaw = this.yaw;
             vehicleEntity.prevPitch = this.prevPitch;
             vehicleEntity.pitch = this.pitch;
+            vehicleEntity.rotationOffset = this.rotationOffset;
         }
         return true;
     }
