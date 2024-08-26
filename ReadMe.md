@@ -8,6 +8,7 @@ Adds the ability to create mobile contraptions with create,
 - change vehicle update leg animation data packet to bytes instead of compound tag to reduce network usage
 - clipping hitboxes instead of rays
 - smarter step targets to allow for going over gaps or obstacles
+- make code less bad please
 
 # Planned:
 - different leg types
