@@ -63,15 +63,22 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         yo = getY();
         zo = getZ();
         
-        Vec3 newPos = toGlobalVectorFromVehicle(new Vec3(1, 0.5, 1).subtract(vehicle.getAnchorOffset()), 0f);
+        xOld = getX();
+        yOld = getY();
+        zOld = getZ();
         
-        setContraptionMotion(newPos.subtract(position()));
+        Vec3 newPos = toGlobalVectorFromVehicle(
+            new Vec3(1, 0.5, 1)
+                .subtract(vehicle.getAnchorOffset()), 1f
+        );
+
+//        setContraptionMotion(newPos.subtract(position()));
         
         setPos(newPos);
         
         //Change position to match the rotation an shit
         
-       vehicle.tickNetworkChanges();
+        vehicle.tickNetworkChanges();
         WalkersPackets.sendToNear(level(), blockPosition(), 20, new VehicleAnimationDataPacket(this));
     }
     
@@ -128,12 +135,6 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         xo = position.x;
         yo = position.y;
         zo = position.z;
-    }
-    
-    @Override
-    protected boolean updateOrientation(boolean rotationLock, boolean wasStalled, Entity riding, boolean isOnCoupling) {
-        super.updateOrientation(rotationLock, wasStalled, riding, isOnCoupling);
-        return true;
     }
     
     private float angleOfVehicleGradient(float partialTicks) {

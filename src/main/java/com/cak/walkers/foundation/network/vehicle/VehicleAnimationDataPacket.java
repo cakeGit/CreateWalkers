@@ -69,9 +69,9 @@ public class VehicleAnimationDataPacket extends SimplePacketBase {
     public boolean handle(NetworkEvent.Context context) {
         if (vehicleEntity != null) {
             vehicleEntity.vehicleAnimationData.read(tagData);
-            vehicleEntity.prevYaw = this.prevYaw;
+            vehicleEntity.prevYaw = vehicleEntity.yaw;
             vehicleEntity.yaw = this.yaw;
-            vehicleEntity.prevPitch = this.prevPitch;
+            vehicleEntity.prevPitch = vehicleEntity.pitch;
             vehicleEntity.pitch = this.pitch;
             vehicleEntity.rotationOffset = this.rotationOffset;
             vehicleEntity.vehiclePos = this.vehiclePos;

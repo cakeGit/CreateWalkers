@@ -2,7 +2,7 @@
 Adds the ability to create mobile contraptions with create,
 
 # Project todo:
-- change the contraption id, VERY IMPORTANT BEFORE ANY RELEASE
+- change the contraption group id, currently stuck on creates one, VERY IMPORTANT BEFORE ANY RELEASE
 - remove unused components of vehicle implementation
 - remove testing client vehicle once contraption vehicles are finished
 - change vehicle update leg animation data packet to bytes instead of compound tag to reduce network usage

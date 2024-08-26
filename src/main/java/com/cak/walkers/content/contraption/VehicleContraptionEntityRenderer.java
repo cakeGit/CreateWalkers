@@ -1,5 +1,6 @@
 package com.cak.walkers.content.contraption;
 
+import com.cak.walkers.content.registry.WalkerBlockPartials;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllPartialModels;
@@ -29,8 +30,8 @@ public class VehicleContraptionEntityRenderer extends ContraptionEntityRenderer<
             .getPosition();
         for (NetworkedLegData legData : ld.contraptionLegData.values()) {
             Vec3 relativePos = legData.getVisualPosition(Mth.lerp(partialTicks, entity.yo, entity.getY()), partialTicks).subtract(entity.getPosition(partialTicks))
-                .subtract(0, 1.5, 0);
-            CachedBufferer.partial(AllPartialModels.COGWHEEL_SHAFT, AllBlocks.SHAFT.getDefaultState())
+                .subtract(-0.5, 1.5, 0.5);
+            CachedBufferer.partial(WalkerBlockPartials.BASE_LEG, AllBlocks.SHAFT.getDefaultState())
                 .translate(relativePos.x, relativePos.y, relativePos.z)
                 .renderInto(ms, buffers.getBuffer(RenderType.solid()));
         }

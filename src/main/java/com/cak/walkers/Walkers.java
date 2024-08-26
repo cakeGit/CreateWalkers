@@ -1,5 +1,6 @@
 package com.cak.walkers;
 
+import com.cak.walkers.content.registry.WalkerBlockPartials;
 import com.cak.walkers.content.registry.WalkersRegistry;
 import com.cak.walkers.foundation.network.WalkersPackets;
 import com.cak.walkers.foundation.vehicle.implementation.TestingClientVehicle;
@@ -32,6 +33,7 @@ public class Walkers {
         REGISTRATE.registerEventListeners(modEventBus);
         WalkersRegistry.register(modEventBus);
         WalkersPackets.registerPackets();
+        WalkerBlockPartials.register();
     }
     
     public static ResourceLocation asResource(String string) {

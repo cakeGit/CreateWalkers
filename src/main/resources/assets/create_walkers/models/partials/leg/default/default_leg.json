@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench by cak :)",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "block/texture",
-		"particle": "block/texture"
+		"0": "create_walkers:block/leg/default/default_leg",
+		"particle": "create_walkers:block/leg/default/default_leg"
 	},
 	"elements": [
 		{
