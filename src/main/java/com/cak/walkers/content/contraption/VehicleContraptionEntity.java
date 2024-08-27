@@ -24,7 +24,6 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
     }
     
     protected boolean disassembleNextTick = false;
-    private boolean animationDataChanged = false;
     /**
      * Server only
      */

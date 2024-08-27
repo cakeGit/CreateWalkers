@@ -24,8 +24,6 @@ public class Walkers {
     public static final String MODID = "create_walkers";
     public static final Logger LOGGER = LogUtils.getLogger();
     
-    public static TestingClientVehicle testingClientVehicle = new TestingClientVehicle();
-    
     public static CreateRegistrate REGISTRATE = CreateRegistrate.create(MODID);
     
     public Walkers() {
@@ -38,33 +36,6 @@ public class Walkers {
     
     public static ResourceLocation asResource(String string) {
         return new ResourceLocation(MODID, string);
-    }
-    
-    @Mod.EventBusSubscriber(value = Dist.CLIENT)
-    public static class ClientEvents {
-        
-        @SubscribeEvent
-        public static void clientTick(TickEvent.ClientTickEvent event) {
-//            if (Minecraft.getInstance().level == null) return;
-//            testingClientVehicle.setCurrentLevel(Minecraft.getInstance().level);
-//            testingClientVehicle.tick();
-        }
-        
-        @SubscribeEvent
-        public static void renderLevelStageEvent(RenderLevelStageEvent event) {
-            if (Minecraft.getInstance().level == null || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
-            if (testingClientVehicle.isInitialised())
-                testingClientVehicle.renderDebug();
-        }
-        
-        @SubscribeEvent
-        public static void clientTick(ClientChatEvent event) {
-            if (event.getMessage().equals(".reset")) {
-                testingClientVehicle = new TestingClientVehicle();
-                event.setCanceled(true);
-            }
-        }
-        
     }
     
 }
