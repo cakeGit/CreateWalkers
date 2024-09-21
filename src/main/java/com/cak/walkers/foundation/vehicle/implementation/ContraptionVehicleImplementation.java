@@ -18,6 +18,8 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
     Vec3 anchorOffset;
     HashMap<BlockPos, AttachedLeg> legsByStructureAnchor = new HashMap<>();
     
+    protected float moveDelta = 0f, rotDelta = 0f;
+    
     public ContraptionVehicleImplementation(Map<BlockPos, Vec3> legPositions, Direction forwards) {
         super(centerLegPositions(legPositions.values()), forwards);
         //legPositions does not correct to be centered
@@ -30,7 +32,15 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
         }
     }
     
-    /**@return whether to send the leg data to client*/
+    @Override
+    public void tick() {
+        movementImpulse = new Vec3(0,   0, moveDelta);
+        rotationImpulse = rotDelta;
+        
+        super.tick();
+    }
+    
+    /**@return whether to send the leg data to client, currently non functional, should probably be removed*/
     public void tickNetworkChanges() {
         for (LegPhysics legPhysics : legPhysicsManager.getAllLegPhysics()) {
             if (legPhysics.isChanged()) {
@@ -79,6 +89,16 @@ public class ContraptionVehicleImplementation extends AbstractVehicleImplementat
     
     public Map<BlockPos, AttachedLeg> getLegsByStructureAnchor() {
         return legsByStructureAnchor;
+    }
+    
+    public void applyControlInput(float moveDelta, float rotDelta) {
+        this.moveDelta = (this.moveDelta + moveDelta) / 2;
+        this.rotDelta = (this.rotDelta + rotDelta) / 2;
+    }
+    
+    public void setControlInput(float moveDelta, float rotDelta) {
+        this.moveDelta = moveDelta;
+        this.rotDelta = rotDelta;
     }
     
 }

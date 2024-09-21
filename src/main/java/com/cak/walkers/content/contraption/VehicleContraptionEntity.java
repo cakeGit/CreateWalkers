@@ -10,12 +10,13 @@ import com.simibubi.create.foundation.utility.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 public class VehicleContraptionEntity extends OrientedContraptionEntity {
     
@@ -79,6 +80,51 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         
         vehicle.tickNetworkChanges();
         WalkersPackets.sendToNear(level(), blockPosition(), 20, new VehicleAnimationDataPacket(this));
+    }
+    
+    @Override
+    public boolean control(BlockPos controlsLocalPos, Collection<Integer> heldControls, Player player) {
+        //temp until vehicle is written
+        if (vehicle == null) return false;
+        
+        if (this.level().isClientSide) {
+            return true;
+        } else if (player.isSpectator()) {
+            return false;
+        } else if (!this.toGlobalVector(VecHelper.getCenterOf(controlsLocalPos), 1.0F).closerThan(player.position(), 8.0)) {
+            return false;
+        } else if (heldControls.contains(5)) {
+            return false;
+        }
+        
+        float moveDelta = (heldControls.contains(1) ? 1 : 0) + (heldControls.contains(2) ? -1 : 0);
+        float rotDelta = (heldControls.contains(3) ? 1 : 0) + (heldControls.contains(4) ? -1 : 0);
+        
+        this.vehicle.applyControlInput(moveDelta, rotDelta);
+        
+        return true;
+    }
+    
+    public boolean startControlling(BlockPos controlsLocalPos, Player player) {
+        if (player != null && !player.isSpectator()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public void stopControlling(BlockPos controlsLocalPos) {
+        super.stopControlling(controlsLocalPos);
+        
+        if (this.vehicle != null) {
+            this.vehicle.setControlInput(0, 0);
+        }
+    }
+    
+    @Override
+    public boolean isControlledByLocalInstance() {
+        return true;
     }
     
     public Vec3 toGlobalVectorFromVehicle(Vec3 localVec, float partialTicks) {

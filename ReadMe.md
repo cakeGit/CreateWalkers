@@ -10,5 +10,10 @@ Adds the ability to create mobile contraptions with create,
 - smarter step targets to allow for going over gaps or obstacles
 - make code less bad please
 
+## Controls Notes:
+- Clone controlsHandler, packet should be interchangeable
+- (Extension of controls util)
+- Make stuff for controlling in the entity
+
 # Planned:
 - different leg types

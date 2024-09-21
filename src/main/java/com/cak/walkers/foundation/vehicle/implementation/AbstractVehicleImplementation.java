@@ -96,6 +96,9 @@ public class AbstractVehicleImplementation {
         return forwardOffset * gradient;
     }
     
+    protected Vec3 movementImpulse = new Vec3(0, 0, 0);
+    protected float rotationImpulse = 0f;
+    
     /**This is falling apart, i think its time i start adding some documentation*/
     public void tick() {
         chasingGradient = gradient;
@@ -113,17 +116,18 @@ public class AbstractVehicleImplementation {
         
         legPhysicsManager.tick();
         
-        Vec3 movementDelta = new Vec3(0, 0, 0);
-        movementDelta = movementDelta.normalize().scale(0.1);
-        movementDelta = movementDelta.yRot(yRot);
+        movementImpulse = movementImpulse.normalize().scale(0.1);
+        movementImpulse = movementImpulse.yRot(yRot);
         
-        float yRotDelta = 0f;
-        legPhysicsManager.tickStepping(movementDelta, yRot + yRotDelta);
+        legPhysicsManager.tickStepping(movementImpulse, yRot + rotationImpulse);
         
-        yRotDelta = Mth.clamp(legPhysicsManager.constrainRotation(yRotDelta), -Math.abs(yRotDelta), Math.abs(yRotDelta));
-        yRot += yRotDelta;
+        rotationImpulse = Mth.clamp(
+            legPhysicsManager.constrainRotation(rotationImpulse),
+            -Math.abs(rotationImpulse), Math.abs(rotationImpulse)
+        ) * 0.05f;
+        yRot += rotationImpulse;
         
-        movementDelta = legPhysicsManager.constrainMovement(movementDelta);
+        movementImpulse = legPhysicsManager.constrainMovement(movementImpulse);
         
         double yPos = position.y - 2;
         legPhysicsManager.tickLegYConstraints();
@@ -170,9 +174,9 @@ public class AbstractVehicleImplementation {
         }
         
         position = position
-            .add(movementDelta)
+            .add(movementImpulse)
             .with(Direction.Axis.Y, yPos + 2);
-        yRot += yRotDelta;
+        yRot += rotationImpulse;
     }
     
     private void initialise() {
