@@ -44,6 +44,11 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
             if (!NetworkedVehicleData.VEHICLE_ANIMATION_TARGETS.containsKey(uuid))
                 NetworkedVehicleData.VEHICLE_ANIMATION_TARGETS.put(uuid, this);
             vehicleAnimationData.tickAnimations();
+//            Vec3 newPos = toGlobalVectorFromVehicle(
+//                new Vec3(1, 0.5, 1)
+//                    .subtract(anchorOffset), 1f
+//            );
+//            setPos(newPos);
             return;
         }
         if (disassembleNextTick)
@@ -53,19 +58,19 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         
         vehicle.tick();
         
-        prevPitch = pitch;
+//        prevPitch = pitch;
         pitch = (float) Math.toDegrees(angleOfVehicleGradient(0));
         
-        prevYaw = yaw;
+//        prevYaw = yaw;
         yaw = -(float) Math.toDegrees(vehicle.getYRot() - rotationOffset);
-        
-        xo = getX();
-        yo = getY();
-        zo = getZ();
-        
-        xOld = getX();
-        yOld = getY();
-        zOld = getZ();
+
+//        xo = getX();
+//        yo = getY();
+//        zo = getZ();
+//
+//        xOld = getX();
+//        yOld = getY();
+//        zOld = getZ();
         
         Vec3 newPos = toGlobalVectorFromVehicle(
             new Vec3(1, 0.5, 1)
@@ -79,7 +84,7 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         //Change position to match the rotation an shit
         
         vehicle.tickNetworkChanges();
-        WalkersPackets.sendToNear(level(), blockPosition(), 20, new VehicleAnimationDataPacket(this));
+//        WalkersPackets.sendToNear(level(), blockPosition(), 20, new VehicleAnimationDataPacket(this));
     }
     
     @Override

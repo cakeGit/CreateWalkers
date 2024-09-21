@@ -176,6 +176,7 @@ public class AbstractVehicleImplementation {
         position = position
             .add(movementImpulse)
             .with(Direction.Axis.Y, yPos + 2);
+        position = position.add(0, 0, 0.1);
         yRot += rotationImpulse;
     }
     
