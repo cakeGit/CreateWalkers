@@ -2,7 +2,8 @@ package com.cak.walkers.content.contraption;
 
 import com.cak.walkers.content.registry.WalkersEntityTypes;
 import com.cak.walkers.foundation.network.WalkersPackets;
-import com.cak.walkers.foundation.network.vehicle.VehicleAnimationDataPacket;
+import com.cak.walkers.foundation.network.vehicle.ShowDEBUGPositionPacket;
+import com.cak.walkers.foundation.network.vehicle.VehicleUpdatePhysicsPacket;
 import com.cak.walkers.foundation.vehicle.implementation.ContraptionVehicleImplementation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.contraptions.OrientedContraptionEntity;
@@ -57,10 +58,10 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
             return;
         
         vehicle.tick();
-        
+
 //        prevPitch = pitch;
         pitch = (float) Math.toDegrees(angleOfVehicleGradient(0));
-        
+
 //        prevYaw = yaw;
         yaw = -(float) Math.toDegrees(vehicle.getYRot() - rotationOffset);
 
@@ -71,20 +72,33 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
 //        xOld = getX();
 //        yOld = getY();
 //        zOld = getZ();
+
+//        Vec3 newPos = toGlobalVectorFromVehicle(
+//            new Vec3(1, 0.5, 1)
+//                .subtract(vehicle.getAnchorOffset()), 1f
+//        );
+
+
+//        setContraptionMotion(newPos.subtract(position()));
+//        setPos(newPos);
         
+        //Change position to match the rotation an shit
+
+//        Vec3 newPos = toGlobalVectorFromVehicle(
+//            new Vec3(1, 0.5, 1)
+//                .add(vehicle.getAnchorOffset()), 1f
+//        );
         Vec3 newPos = toGlobalVectorFromVehicle(
             new Vec3(1, 0.5, 1)
                 .subtract(vehicle.getAnchorOffset()), 1f
         );
-
-//        setContraptionMotion(newPos.subtract(position()));
-        
         setPos(newPos);
         
-        //Change position to match the rotation an shit
-        
         vehicle.tickNetworkChanges();
-//        WalkersPackets.sendToNear(level(), blockPosition(), 20, new VehicleAnimationDataPacket(this));
+
+//
+        WalkersPackets.sendToNear(level(), blockPosition(), 20, new ShowDEBUGPositionPacket(newPos));
+        WalkersPackets.sendToNear(level(), blockPosition(), 20, new VehicleUpdatePhysicsPacket(this));
     }
     
     @Override

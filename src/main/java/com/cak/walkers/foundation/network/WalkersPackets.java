@@ -1,7 +1,8 @@
 package com.cak.walkers.foundation.network;
 
 import com.cak.walkers.Walkers;
-import com.cak.walkers.foundation.network.vehicle.VehicleAnimationDataPacket;
+import com.cak.walkers.foundation.network.vehicle.ShowDEBUGPositionPacket;
+import com.cak.walkers.foundation.network.vehicle.VehicleUpdatePhysicsPacket;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -19,7 +20,8 @@ import java.util.function.Supplier;
 
 /**THANK GOD TO SIMI FOR YOUR WONDERFUL MIT LISCENCE I LOVE YOU*/
 public enum WalkersPackets {
-    VEHICLE_LEG_UPDATE(VehicleAnimationDataPacket.class, VehicleAnimationDataPacket::new, NetworkDirection.PLAY_TO_CLIENT)
+    ShowDEBUGPositionPacket(ShowDEBUGPositionPacket.class, ShowDEBUGPositionPacket::new, NetworkDirection.PLAY_TO_CLIENT),
+    VEHICLE_LEG_UPDATE(VehicleUpdatePhysicsPacket.class, VehicleUpdatePhysicsPacket::new, NetworkDirection.PLAY_TO_CLIENT)
     ;
     
     public static final ResourceLocation CHANNEL_NAME = Walkers.asResource("main");

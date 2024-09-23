@@ -8,7 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
-public class VehicleAnimationDataPacket extends SimplePacketBase {
+public class VehicleUpdatePhysicsPacket extends SimplePacketBase {
     
     VehicleContraptionEntity vehicleEntity;
     
@@ -21,7 +21,7 @@ public class VehicleAnimationDataPacket extends SimplePacketBase {
     CompoundTag tagData;
     Vec3 vehiclePos;
     
-    public VehicleAnimationDataPacket(VehicleContraptionEntity vehicleEntity) {
+    public VehicleUpdatePhysicsPacket(VehicleContraptionEntity vehicleEntity) {
         this.vehicleEntity = vehicleEntity;
         this.tagData = vehicleEntity.vehicleAnimationData.write(new CompoundTag(), vehicleEntity);
         
@@ -34,7 +34,7 @@ public class VehicleAnimationDataPacket extends SimplePacketBase {
         this.vehiclePos = vehicleEntity.vehicle.getPosition();
     }
     
-    public VehicleAnimationDataPacket(FriendlyByteBuf buffer) {
+    public VehicleUpdatePhysicsPacket(FriendlyByteBuf buffer) {
         this.vehicleEntity = NetworkedVehicleData.VEHICLE_ANIMATION_TARGETS.get(buffer.readUUID());
         if (vehicleEntity != null) {
             this.tagData = buffer.readNbt();
@@ -74,7 +74,7 @@ public class VehicleAnimationDataPacket extends SimplePacketBase {
             vehicleEntity.prevPitch = vehicleEntity.pitch;
             vehicleEntity.pitch = this.pitch;
             vehicleEntity.rotationOffset = this.rotationOffset;
-            vehicleEntity.vehiclePos = this.vehiclePos;
+            vehicleEntity.setPos(this.vehiclePos);
         }
         return true;
     }
