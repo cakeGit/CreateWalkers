@@ -13,8 +13,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class LegPhysics {
     
     public static final int TOTAL_STEP_TICKS = 5;

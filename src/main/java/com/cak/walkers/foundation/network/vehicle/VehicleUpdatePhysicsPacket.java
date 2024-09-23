@@ -22,16 +22,16 @@ public class VehicleUpdatePhysicsPacket extends SimplePacketBase {
     Vec3 vehiclePos;
     
     public VehicleUpdatePhysicsPacket(VehicleContraptionEntity vehicleEntity) {
-        this.vehicleEntity = vehicleEntity;
-        this.tagData = vehicleEntity.vehicleAnimationData.write(new CompoundTag(), vehicleEntity);
-        
-        this.prevYaw = vehicleEntity.prevYaw;
-        this.yaw = vehicleEntity.yaw;
-        this.prevPitch = vehicleEntity.prevPitch;
-        this.pitch = vehicleEntity.pitch;
-        this.rotationOffset = vehicleEntity.rotationOffset;
-        
-        this.vehiclePos = vehicleEntity.vehicle.getPosition();
+//        this.vehicleEntity = vehicleEntity;
+//        this.tagData = vehicleEntity.vehicleAnimationData.write(new CompoundTag(), vehicleEntity);
+//
+//        this.prevYaw = vehicleEntity.prevYaw;
+//        this.yaw = vehicleEntity.yaw;
+//        this.prevPitch = vehicleEntity.prevPitch;
+//        this.pitch = vehicleEntity.pitch;
+//        this.rotationOffset = vehicleEntity.rotationOffset;
+//
+//        this.vehiclePos = vehicleEntity.vehicle.getPosition();
     }
     
     public VehicleUpdatePhysicsPacket(FriendlyByteBuf buffer) {
@@ -67,15 +67,15 @@ public class VehicleUpdatePhysicsPacket extends SimplePacketBase {
     
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        if (vehicleEntity != null) {
-            vehicleEntity.vehicleAnimationData.read(tagData);
-            vehicleEntity.prevYaw = vehicleEntity.yaw;
-            vehicleEntity.yaw = this.yaw;
-            vehicleEntity.prevPitch = vehicleEntity.pitch;
-            vehicleEntity.pitch = this.pitch;
-            vehicleEntity.rotationOffset = this.rotationOffset;
-            vehicleEntity.setPos(this.vehiclePos);
-        }
+//        if (vehicleEntity != null) {
+//            vehicleEntity.vehicleAnimationData.read(tagData);
+//            vehicleEntity.prevYaw = vehicleEntity.yaw;
+//            vehicleEntity.yaw = this.yaw;
+//            vehicleEntity.prevPitch = vehicleEntity.pitch;
+//            vehicleEntity.pitch = this.pitch;
+//            vehicleEntity.rotationOffset = this.rotationOffset;
+//            vehicleEntity.setPos(this.vehiclePos);
+//        }
         return true;
     }
     

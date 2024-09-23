@@ -23,9 +23,8 @@ import java.util.Map;
 
 public class VehicleContraption extends Contraption {
     
-    @Nullable ContraptionVehicleImplementation vehicle;
-    
     Map<BlockPos, Vec3> collectedLegPositions = new HashMap<>();
+    Direction forwardsDirection;
     BlockPos assemblyAnchor;
     
     @Override
@@ -36,12 +35,9 @@ public class VehicleContraption extends Contraption {
         if (!searchMovedStructure(world, pos, null))
             return false;
         
-        //Check captured blocks form a valid vehicle, potentially throwing an AssemblyException
-        ContraptionVehicleImplementation.validate(collectedLegPositions.values(), forwardsDirection.getAxis());
+        //TODO: Check captured blocks form a valid vehicle, potentially throwing an AssemblyException
         
-        //Now create the vehicle
-        vehicle = new ContraptionVehicleImplementation(collectedLegPositions, forwardsDirection);
-        
+        this.forwardsDirection = forwardsDirection;
         startMoving(world);
         return true;
     }
@@ -67,9 +63,6 @@ public class VehicleContraption extends Contraption {
     @Override
     public void onEntityCreated(AbstractContraptionEntity entity) {
         super.onEntityCreated(entity);
-        if (entity instanceof VehicleContraptionEntity vce) {
-            vce.vehicle = vehicle;
-        }
     }
     
     @Override

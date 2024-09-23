@@ -8,10 +8,13 @@ import com.simibubi.create.content.contraptions.AssemblyException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class ContraptionVehicleImplementation extends AbstractVehicleImplementation {
     
     /**The relative position of the center of the vehicle implementation to the center of the contraption*/

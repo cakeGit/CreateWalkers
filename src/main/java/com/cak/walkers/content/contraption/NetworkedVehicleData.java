@@ -4,9 +4,12 @@ import com.cak.walkers.foundation.vehicle.AttachedLeg;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class NetworkedVehicleData {
     
     public static final HashMap<UUID, VehicleContraptionEntity> VEHICLE_ANIMATION_TARGETS = new HashMap<>();
@@ -21,21 +24,21 @@ public class NetworkedVehicleData {
     }
     
     protected void update(VehicleContraptionEntity vce) {
-        for (Map.Entry<BlockPos, AttachedLeg> entry : vce.vehicle.getLegsByStructureAnchor().entrySet()) {
-            
-            BlockPos anchor = entry.getKey();
-            AttachedLeg leg = entry.getValue();
-            
-            if (!legsByAttachment.containsKey(leg)) {
-                NetworkedLegData legData = new NetworkedLegData();
-                legData.leg = leg;
-                legsByAttachment.put(leg, legData);
-                contraptionLegData.put(anchor, legData);
-            }
-        
-            NetworkedLegData legData = legsByAttachment.get(leg);
-            legData.update(leg);
-        }
+//        for (Map.Entry<BlockPos, AttachedLeg> entry : vce.vehicle.getLegsByStructureAnchor().entrySet()) {
+//
+//            BlockPos anchor = entry.getKey();
+//            AttachedLeg leg = entry.getValue();
+//
+//            if (!legsByAttachment.containsKey(leg)) {
+//                NetworkedLegData legData = new NetworkedLegData();
+//                legData.leg = leg;
+//                legsByAttachment.put(leg, legData);
+//                contraptionLegData.put(anchor, legData);
+//            }
+//
+//            NetworkedLegData legData = legsByAttachment.get(leg);
+//            legData.update(leg);
+//        }
     }
     
     public CompoundTag write(CompoundTag tag, VehicleContraptionEntity vce) {

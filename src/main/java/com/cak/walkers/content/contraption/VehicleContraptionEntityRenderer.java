@@ -1,6 +1,7 @@
 package com.cak.walkers.content.contraption;
 
 import com.cak.walkers.content.registry.WalkerBlockPartials;
+import com.cak.walkers.foundation.vehicle.fake_testing_to_be_replaced.VehiclePhysics;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllPartialModels;
@@ -23,17 +24,29 @@ public class VehicleContraptionEntityRenderer extends ContraptionEntityRenderer<
     @Override
     public void render(VehicleContraptionEntity entity, float yaw, float partialTicks, PoseStack ms, MultiBufferSource buffers, int overlay) {
         ms.pushPose();
-        NetworkedVehicleData ld = entity.vehicleAnimationData;
-        if (ld == null) return;
-        SuperRenderTypeBuffer buffer = SuperRenderTypeBuffer.getInstance();
-        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
-            .getPosition();
-        for (NetworkedLegData legData : ld.contraptionLegData.values()) {
-            Vec3 relativePos = legData.getVisualPosition(Mth.lerp(partialTicks, entity.yo, entity.getY()), partialTicks).subtract(entity.getPosition(partialTicks))
-                .subtract(0, 1.5, 0);
+//        NetworkedVehicleData ld = entity.vehicleAnimationData;
+//        if (ld == null) return;
+//        SuperRenderTypeBuffer buffer = SuperRenderTypeBuffer.getInstance();
+//        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
+//            .getPosition();
+//        for (NetworkedLegData legData : ld.contraptionLegData.values()) {
+//            Vec3 relativePos = legData.getVisualPosition(Mth.lerp(partialTicks, entity.yo, entity.getY()), partialTicks).subtract(entity.getPosition(partialTicks))
+//                .subtract(0, 1.5, 0);
+//            CachedBufferer.partial(WalkerBlockPartials.BASE_LEG, AllBlocks.SHAFT.getDefaultState())
+//                .translate(relativePos.x, relativePos.y, relativePos.z)
+//                .renderInto(ms, buffers.getBuffer(RenderType.solid()));
+//        }
+        
+        if (entity.vehiclePhysics == null) {
+            System.out.println("Missing physics for render " + entity.getStringUUID());
+        } else {
+            for (VehiclePhysics.VehicleLeg leg : entity.vehiclePhysics.getLegs()) {
+
+            Vec3 relativePos = leg.getWorldPosition(partialTicks).subtract(entity.getPosition(partialTicks));
             CachedBufferer.partial(WalkerBlockPartials.BASE_LEG, AllBlocks.SHAFT.getDefaultState())
                 .translate(relativePos.x, relativePos.y, relativePos.z)
                 .renderInto(ms, buffers.getBuffer(RenderType.solid()));
+            }
         }
         ms.popPose();
         super.render(entity, yaw, partialTicks, ms, buffers, overlay);

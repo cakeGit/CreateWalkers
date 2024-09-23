@@ -2,6 +2,7 @@ package com.cak.walkers.foundation.vehicle;
 
 import com.jozufozu.flywheel.util.Pair;
 import net.minecraft.core.Direction;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class BalanceInfo {
     
     HashMap<Integer, Balance> balancesByOffset = new HashMap<>();

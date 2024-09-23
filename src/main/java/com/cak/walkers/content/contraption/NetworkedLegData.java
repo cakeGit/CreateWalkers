@@ -6,10 +6,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import static com.cak.walkers.foundation.vehicle.LegPhysics.GETTOTAL_STEP_TICKSFREEOFFINALTYRANTY;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class NetworkedLegData {
     
     /**Server only*/

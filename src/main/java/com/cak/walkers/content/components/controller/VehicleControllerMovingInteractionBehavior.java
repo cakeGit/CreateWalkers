@@ -23,7 +23,7 @@ public class VehicleControllerMovingInteractionBehavior extends MovingInteractio
         
         if (contraptionEntity instanceof VehicleContraptionEntity vce) {
             
-            if (currentItem.is(AllItems.WRENCH.get()) && !contraptionEntity.level().isClientSide)
+            if (currentItem.is(AllItems.WRENCH.get()))
                 vce.disassembleNextTick();
             else {
                 UUID currentlyControlling = contraptionEntity.getControllingPlayer().orElse(null);

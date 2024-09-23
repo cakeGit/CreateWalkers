@@ -5,10 +5,13 @@ import com.cak.walkers.foundation.vehicle.implementation.AbstractVehicleImplemen
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class LegPhysicsManager {
     
     AbstractVehicleImplementation vehicle;
