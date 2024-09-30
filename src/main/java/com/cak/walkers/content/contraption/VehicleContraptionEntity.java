@@ -44,37 +44,42 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         if (disassembleNextTick && !this.level().isClientSide) disassemble();
         
         if (vehiclePhysics == null) {
-            legOffsetCenter = new Vec3(0, 0, 0);
-            
-            List<VehiclePhysics.VehicleLeg> legs = new ArrayList<>();
-            
-            if (vehicleContraption.collectedLegPositions.isEmpty()) {
-                legs.add(new VehiclePhysics.VehicleLeg(new Vec3(2, -2, 2)));
-                legs.add(new VehiclePhysics.VehicleLeg(new Vec3(-2, -2, 2)));
-                legs.add(new VehiclePhysics.VehicleLeg(new Vec3(-2, -2, -2)));
-                legs.add(new VehiclePhysics.VehicleLeg(new Vec3(2, -2, -2)));
-            } else {
-                for (Vec3 pos : vehicleContraption.collectedLegPositions.values()) {
-                    legs.add(new VehiclePhysics.VehicleLeg(pos.subtract(Vec3.atCenterOf(vehicleContraption.assemblyAnchor))));
-                }
-            }
-            
-            int count = 0;
-            for (VehiclePhysics.VehicleLeg pos : legs) {
-                legOffsetCenter = legOffsetCenter.add(pos.getOffset());
-                count++;
-            }
-            legOffsetCenter = legOffsetCenter.scale(1f / count);
-            for (VehiclePhysics.VehicleLeg leg : legs) {
-                leg.setOffset(leg.getOffset().subtract(legOffsetCenter));
-            }
-            vehiclePhysics = new VehiclePhysics(position(), legs);
-            setPos(vehiclePhysics.getPosition().add(0.5, 2, 0.5));
+            setupVehiclePhysics(vehicleContraption);
         }
         
         WalkersPackets.sendToNear(level(), blockPosition(), 20, new ShowDEBUGPositionPacket(position()));
         
         vehiclePhysics.tick();
+    }
+    
+    private void setupVehiclePhysics(VehicleContraption vehicleContraption) {
+        legOffsetCenter = new Vec3(0, 0, 0);
+        
+        List<VehiclePhysics.VehicleLeg> legs = new ArrayList<>();
+        
+        if (vehicleContraption.collectedLegPositions.isEmpty()) {
+            legs.add(new VehiclePhysics.VehicleLeg(new Vec3(1.5, -2, 1.5)));
+            legs.add(new VehiclePhysics.VehicleLeg(new Vec3(-1.5, -2, 1.5)));
+            legs.add(new VehiclePhysics.VehicleLeg(new Vec3(-1.5, -2, -1.5)));
+            legs.add(new VehiclePhysics.VehicleLeg(new Vec3(1.5, -2, -1.5)));
+        } else {
+            for (Vec3 pos : vehicleContraption.collectedLegPositions.values()) {
+                legs.add(new VehiclePhysics.VehicleLeg(pos.subtract(Vec3.atCenterOf(vehicleContraption.assemblyAnchor))));
+            }
+        }
+        
+        int count = 0;
+        for (VehiclePhysics.VehicleLeg pos : legs) {
+            legOffsetCenter = legOffsetCenter.add(pos.getOffset());
+            count++;
+        }
+        legOffsetCenter = legOffsetCenter.scale(1f / count);
+        for (VehiclePhysics.VehicleLeg leg : legs) {
+            leg.setOffset(leg.getOffset().subtract(legOffsetCenter.add(0, 2, 0)));
+        }
+        legOffsetCenter = legOffsetCenter.add(0.5, 0, 0.5);
+        vehiclePhysics = new VehiclePhysics(position(), legs);
+        setPos(vehiclePhysics.getPosition().subtract(legOffsetCenter));
     }
     
     

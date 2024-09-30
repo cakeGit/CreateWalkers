@@ -42,8 +42,8 @@ public class VehicleContraptionEntityRenderer extends ContraptionEntityRenderer<
         } else {
             for (VehiclePhysics.VehicleLeg leg : entity.vehiclePhysics.getLegs()) {
 
-            Vec3 relativePos = leg.getWorldPosition(partialTicks).subtract(entity.getPosition(partialTicks));
-            CachedBufferer.partial(WalkerBlockPartials.BASE_LEG, AllBlocks.SHAFT.getDefaultState())
+            Vec3 relativePos = leg.getWorldPosition(partialTicks).subtract(entity.getPosition(1f)).add(entity.vehiclePhysics.getPosition().subtract(entity.getPosition(1f)));
+            CachedBufferer.partial(WalkerBlockPartials.TEST_LEG, AllBlocks.SHAFT.getDefaultState())
                 .translate(relativePos.x, relativePos.y, relativePos.z)
                 .renderInto(ms, buffers.getBuffer(RenderType.solid()));
             }
