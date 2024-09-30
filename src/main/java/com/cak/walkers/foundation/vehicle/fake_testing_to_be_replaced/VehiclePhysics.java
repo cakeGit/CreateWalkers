@@ -1,5 +1,7 @@
 package com.cak.walkers.foundation.vehicle.fake_testing_to_be_replaced;
 
+import com.cak.walkers.content.components.controller.VehicleControllerBlockEntity;
+import com.cak.walkers.content.contraption.VehicleContraptionEntity;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -14,10 +16,11 @@ public class VehiclePhysics {
         this.legs = legs;
     }
     
-    public void tick() {
+    public void tick(VehicleContraptionEntity owner) {
         for (VehicleLeg leg : legs) {
             leg.worldPosition = position.add(leg.offset);
         }
+        owner.setPosFromVehicle(position);
     }
     
     public Vec3 getPosition() {
@@ -26,6 +29,10 @@ public class VehiclePhysics {
     
     public List<VehicleLeg> getLegs() {
         return legs;
+    }
+    
+    public void setPosition(Vec3 position) {
+        this.position = position;
     }
     
     public static class VehicleLeg {

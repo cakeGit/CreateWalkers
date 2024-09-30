@@ -3,29 +3,22 @@ package com.cak.walkers.content.contraption;
 import com.cak.walkers.content.registry.WalkersEntityTypes;
 import com.cak.walkers.foundation.network.WalkersPackets;
 import com.cak.walkers.foundation.network.vehicle.ShowDEBUGPositionPacket;
-import com.cak.walkers.foundation.network.vehicle.VehicleUpdatePhysicsPacket;
 import com.cak.walkers.foundation.vehicle.fake_testing_to_be_replaced.VehiclePhysics;
-import com.cak.walkers.foundation.vehicle.implementation.ContraptionVehicleImplementation;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.AllEntityTypes;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.OrientedContraptionEntity;
-import com.simibubi.create.foundation.utility.VecHelper;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class VehicleContraptionEntity extends OrientedContraptionEntity {
     
+    //TODO Make this into synced datya
     VehiclePhysics vehiclePhysics;
     
     boolean disassembleNextTick = false;
@@ -38,7 +31,6 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
     
     @Override
     public void tick() {
-        super.tick();
         if (!(contraption instanceof VehicleContraption vehicleContraption)) return;
         
         if (disassembleNextTick && !this.level().isClientSide) disassemble();
@@ -47,9 +39,11 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
             setupVehiclePhysics(vehicleContraption);
         }
         
+        super.tick();
+        
         WalkersPackets.sendToNear(level(), blockPosition(), 20, new ShowDEBUGPositionPacket(position()));
         
-        vehiclePhysics.tick();
+        vehiclePhysics.tick(this);
     }
     
     private void setupVehiclePhysics(VehicleContraption vehicleContraption) {
@@ -82,6 +76,26 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
         setPos(vehiclePhysics.getPosition().subtract(legOffsetCenter));
     }
     
+    @Override
+    protected void writeAdditional(CompoundTag compound, boolean spawnPacket) {
+        super.writeAdditional(compound, spawnPacket);
+        if (vehiclePhysics != null) {
+            compound.putDouble("VehiclePhysicsX", vehiclePhysics.getPosition().x);
+            compound.putDouble("VehiclePhysicsY", vehiclePhysics.getPosition().y);
+            compound.putDouble("VehiclePhysicsZ", vehiclePhysics.getPosition().z);
+        }
+    }
+    
+    @Override
+    protected void readAdditional(CompoundTag compound, boolean spawnPacket) {
+        super.readAdditional(compound, spawnPacket);
+        if (vehiclePhysics != null)
+            vehiclePhysics.setPosition(new Vec3(
+                compound.getDouble("VehiclePhysicsX"),
+                compound.getDouble("VehiclePhysicsY"),
+                compound.getDouble("VehiclePhysicsZ")
+            ));
+    }
     
     public static VehicleContraptionEntity create(Level world, Contraption contraption, Direction initialOrientation) {
         VehicleContraptionEntity entity =
@@ -94,6 +108,10 @@ public class VehicleContraptionEntity extends OrientedContraptionEntity {
     
     public void disassembleNextTick() {
         disassembleNextTick = true;
+    }
+    
+    public void setPosFromVehicle(Vec3 position) {
+        setPos(position.subtract(legOffsetCenter));
     }
     
 }
